@@ -8,6 +8,7 @@ const CATEGORY_LABELS: Record<string, { name: string; icon: string }> = {
   schultz: { name: 'Schultz', icon: '🕯️' },
   meditation: { name: 'Medytacja', icon: '🧘' },
   focus: { name: 'Focus/Sen', icon: '🎧' },
+  light: { name: 'Podróż światła', icon: '✨' },
   biofeedback: { name: 'Biofeedback', icon: '❤️' },
   game: { name: 'Gry', icon: '🧠' },
 };

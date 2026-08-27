@@ -176,3 +176,87 @@ export function startFocusSession(mode: FocusMode, volume = 0.5): FocusSessionHa
     },
   };
 }
+
+export interface AmbientHandle {
+  stop: () => void;
+  setVolume: (v: number) => void;
+}
+
+// Akord zawieszony (sus2/add9) w niskim rejestrze — ciepłe, spokojne tło.
+const AMBIENT_CHORD_HZ = [98.0, 130.81, 146.83, 220.0];
+
+/**
+ * Generuje ewoluujące, ambientowe tło muzyczne (bez próbek, w 100% syntezowane).
+ * Warstwy detunowanych fal z wolnym LFO na głośności, dającym wrażenie "oddychającego" pada.
+ */
+export function startAmbientMusic(volume = 0.35): AmbientHandle {
+  const c = getCtx();
+  const now = c.currentTime;
+
+  const master = c.createGain();
+  master.gain.setValueAtTime(0, now);
+  master.gain.linearRampToValueAtTime(volume, now + 2.5);
+
+  const filter = c.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = 1200;
+  filter.connect(master);
+  master.connect(c.destination);
+
+  const voices: { osc: OscillatorNode; lfo: OscillatorNode }[] = [];
+
+  AMBIENT_CHORD_HZ.forEach((freq, i) => {
+    const osc = c.createOscillator();
+    osc.type = 'triangle';
+    osc.frequency.value = freq;
+    osc.detune.value = (i % 2 === 0 ? -1 : 1) * (4 + i * 2);
+
+    const voiceGain = c.createGain();
+    voiceGain.gain.value = 0.16;
+
+    // wolne, niesynchroniczne wahanie głośności każdego głosu ("oddech" pada)
+    const lfo = c.createOscillator();
+    lfo.type = 'sine';
+    lfo.frequency.value = 0.05 + i * 0.017;
+    const lfoGain = c.createGain();
+    lfoGain.gain.value = 0.08;
+    lfo.connect(lfoGain).connect(voiceGain.gain);
+
+    osc.connect(voiceGain).connect(filter);
+    osc.start(now);
+    lfo.start(now);
+    voices.push({ osc, lfo });
+  });
+
+  // bardzo wolny, cykliczny sweep filtru dla ruchu w tle (LFO zamiast jednorazowej rampy)
+  filter.frequency.value = 1200;
+  const filterLfo = c.createOscillator();
+  filterLfo.type = 'sine';
+  filterLfo.frequency.value = 1 / 24; // pełny cykl co ok. 24s
+  const filterLfoGain = c.createGain();
+  filterLfoGain.gain.value = 350;
+  filterLfo.connect(filterLfoGain).connect(filter.frequency);
+  filterLfo.start(now);
+  voices.push({ osc: filterLfo, lfo: filterLfo });
+
+  let stopped = false;
+  return {
+    stop: () => {
+      if (stopped) return;
+      stopped = true;
+      const t = c.currentTime;
+      master.gain.cancelScheduledValues(t);
+      master.gain.setValueAtTime(master.gain.value, t);
+      master.gain.linearRampToValueAtTime(0, t + 1.2);
+      setTimeout(() => {
+        voices.forEach(({ osc, lfo }) => {
+          osc.stop();
+          lfo.stop();
+        });
+      }, 1300);
+    },
+    setVolume: (v: number) => {
+      master.gain.setTargetAtTime(v, c.currentTime, 0.2);
+    },
+  };
+}

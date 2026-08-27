@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { to: '/schultz', label: 'Schultz', icon: '🕯️' },
   { to: '/medytacja', label: 'Medytacja', icon: '🧘' },
   { to: '/focus', label: 'Focus/Sen', icon: '🎧' },
+  { to: '/swiatlo', label: 'Światło', icon: '✨' },
   { to: '/gry', label: 'Trening mózgu', icon: '🧠' },
   { to: '/biofeedback', label: 'Biofeedback', icon: '❤️' },
   { to: '/postepy', label: 'Postępy', icon: '📈' },

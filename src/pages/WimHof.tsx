@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button, Card, Pill, SectionTitle } from '../components/ui';
-import { playBeep, playChime, unlockAudio } from '../lib/audio';
+import { BreathOrb } from '../components/BreathOrb';
+import { playBeep, playChime, startAmbientMusic, unlockAudio, type AmbientHandle } from '../lib/audio';
 import { speak } from '../lib/tts';
 import { logSession } from '../lib/storage';
 import { formatMMSS } from '../hooks/useTimer';
@@ -20,6 +21,8 @@ export default function WimHof() {
   const [pace, setPace] = useState<Pace>('medium');
   const [recoveryHoldSec, setRecoveryHoldSec] = useState(15);
   const [voiceOn, setVoiceOn] = useState(false);
+  const [musicOn, setMusicOn] = useState(true);
+  const [musicVolume, setMusicVolume] = useState(0.35);
 
   const [phase, setPhase] = useState<Phase>('setup');
   const [currentRound, setCurrentRound] = useState(1);
@@ -34,13 +37,20 @@ export default function WimHof() {
   const startTimeRef = useRef<number>(0);
   const bestHoldRef = useRef(0);
   const holdSecondsRef = useRef(0);
+  const musicRef = useRef<AmbientHandle | null>(null);
 
   const clearTimers = () => {
     if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
     if (intervalRef.current) window.clearInterval(intervalRef.current);
   };
 
-  useEffect(() => () => clearTimers(), []);
+  useEffect(
+    () => () => {
+      clearTimers();
+      musicRef.current?.stop();
+    },
+    [],
+  );
 
   function speakIfOn(text: string) {
     if (!voiceOn) return;
@@ -51,6 +61,10 @@ export default function WimHof() {
     unlockAudio();
     startTimeRef.current = Date.now();
     setCurrentRound(1);
+    if (musicOn) {
+      musicRef.current?.stop();
+      musicRef.current = startAmbientMusic(musicVolume);
+    }
     startBreathingRound();
   }
 
@@ -108,6 +122,8 @@ export default function WimHof() {
   function finishRound() {
     playChime();
     if (currentRound >= rounds) {
+      musicRef.current?.stop();
+      musicRef.current = null;
       setPhase('done');
       const totalSec = Math.round((Date.now() - startTimeRef.current) / 1000);
       logSession({
@@ -131,7 +147,14 @@ export default function WimHof() {
 
   function stopSession() {
     clearTimers();
+    musicRef.current?.stop();
+    musicRef.current = null;
     setPhase('setup');
+  }
+
+  function onMusicVolumeChange(v: number) {
+    setMusicVolume(v);
+    musicRef.current?.setVolume(v);
   }
 
   const paceLabel = { slow: 'Wolne', medium: 'Średnie', fast: 'Szybkie' };
@@ -211,6 +234,24 @@ export default function WimHof() {
               <input type="checkbox" checked={voiceOn} onChange={(e) => setVoiceOn(e.target.checked)} className="accent-[var(--color-primary)]" />
               Narracja głosowa (PL)
             </label>
+            <div>
+              <label className="mb-2 flex items-center gap-2 text-sm text-[var(--color-muted)]">
+                <input type="checkbox" checked={musicOn} onChange={(e) => setMusicOn(e.target.checked)} className="accent-[var(--color-primary)]" />
+                Muzyka ambientowa w tle
+              </label>
+              {musicOn && (
+                <input
+                  type="range"
+                  min={0}
+                  max={0.8}
+                  step={0.05}
+                  value={musicVolume}
+                  onChange={(e) => onMusicVolumeChange(Number(e.target.value))}
+                  className="w-full accent-[var(--color-primary)]"
+                  aria-label="Głośność muzyki"
+                />
+              )}
+            </div>
             <Button className="w-full" onClick={startSession}>
               Rozpocznij sesję
             </Button>
@@ -223,18 +264,13 @@ export default function WimHof() {
           <Pill tone="accent">
             Runda {currentRound} / {rounds}
           </Pill>
-          <div className="relative flex h-64 w-64 items-center justify-center">
-            <div
-              className="absolute h-56 w-56 rounded-full bg-gradient-to-br from-[var(--color-primary)]/40 to-[var(--color-accent)]/30"
-              style={{
-                animation: `${breathStage === 'in' ? 'breathe-in' : 'breathe-out'} ${PACE_MS[pace][breathStage === 'in' ? 'inhale' : 'exhale']}ms ease-in-out forwards`,
-              }}
-            />
-            <div className="relative text-center">
-              <p className="text-4xl font-bold">{breathIndex + 1}</p>
-              <p className="text-sm text-[var(--color-muted)]">/ {breathsPerRound}</p>
-            </div>
-          </div>
+          <BreathOrb
+            stage={breathStage}
+            inhaleMs={PACE_MS[pace].inhale}
+            exhaleMs={PACE_MS[pace].exhale}
+            breathIndex={breathIndex}
+            totalBreaths={breathsPerRound}
+          />
           <p className="text-xl font-semibold">{breathStage === 'in' ? 'Wdech przez nos' : 'Wydech, luźno'}</p>
           <Button variant="ghost" onClick={stopSession}>
             Zatrzymaj sesję

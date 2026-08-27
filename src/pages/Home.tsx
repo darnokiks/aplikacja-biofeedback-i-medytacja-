@@ -39,6 +39,13 @@ const MODULES = [
     tag: 'Dźwięk',
   },
   {
+    to: '/swiatlo',
+    icon: '✨',
+    title: 'Podróż światła',
+    description: 'Łagodnie pulsujące światło w rytmie oddechu, inspirowane light journey (np. Lumenate) — bez migotania.',
+    tag: 'Światło',
+  },
+  {
     to: '/gry',
     icon: '🧠',
     title: 'Trening mózgu',

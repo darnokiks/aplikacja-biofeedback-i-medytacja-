@@ -6,6 +6,7 @@ export type SessionCategory =
   | 'schultz'
   | 'meditation'
   | 'focus'
+  | 'light'
   | 'biofeedback'
   | 'game';
 
@@ -101,6 +102,7 @@ export function getCategoryTotals(): Record<SessionCategory, number> {
     schultz: 0,
     meditation: 0,
     focus: 0,
+    light: 0,
     biofeedback: 0,
     game: 0,
   };
