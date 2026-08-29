@@ -12,6 +12,7 @@ import ReactionGame from './pages/games/ReactionGame';
 import MemoryGame from './pages/games/MemoryGame';
 import NBackGame from './pages/games/NBackGame';
 import Biofeedback from './pages/Biofeedback';
+import Devices from './pages/Devices';
 import Progress from './pages/Progress';
 import NotFound from './pages/NotFound';
 
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/gry/pamiec" element={<MemoryGame />} />
           <Route path="/gry/nback" element={<NBackGame />} />
           <Route path="/biofeedback" element={<Biofeedback />} />
+          <Route path="/urzadzenia" element={<Devices />} />
           <Route path="/postepy" element={<Progress />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

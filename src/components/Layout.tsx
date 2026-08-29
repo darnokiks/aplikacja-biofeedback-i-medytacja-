@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { to: '/swiatlo', label: 'Światło', icon: '✨' },
   { to: '/gry', label: 'Trening mózgu', icon: '🧠' },
   { to: '/biofeedback', label: 'Biofeedback', icon: '❤️' },
+  { to: '/urzadzenia', label: 'Urządzenia', icon: '🔧' },
   { to: '/postepy', label: 'Postępy', icon: '📈' },
 ] as const;
 

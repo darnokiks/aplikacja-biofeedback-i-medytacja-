@@ -60,6 +60,13 @@ const MODULES = [
     tag: 'Biofeedback',
   },
   {
+    to: '/urzadzenia',
+    icon: '🔧',
+    title: 'Urządzenia',
+    description: 'Sparuj czujnik tętna (np. Polar) lub headset EEG (Muse, OpenBCI Ganglion) przez Bluetooth.',
+    tag: 'Sprzęt',
+  },
+  {
     to: '/postepy',
     icon: '📈',
     title: 'Postępy',

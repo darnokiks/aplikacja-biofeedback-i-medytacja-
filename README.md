@@ -19,6 +19,10 @@ Dane (historia sesji, wyniki gier) zapisywane są lokalnie w `localStorage`.
 - **Podróż światła** — pulsujące światło w rytmie oddechu (tryb łagodny) oraz opcjonalny tryb stroboskopu z
   ograniczoną częstotliwością i zabezpieczeniami (patrz niżej), inspirowane light-journey (np. Lumenate).
 - **Biofeedback** — eksperymentalny pomiar tętna z kamery (rPPG) oraz pacer oddechowy (koherentny, pudełkowy, 4-7-8).
+- **Urządzenia** — parowanie prawdziwego sprzętu przez Web Bluetooth: dowolny czujnik tętna zgodny ze standardową
+  usługą „Heart Rate" (np. Polar H10), headset EEG Muse 2/S (przez bibliotekę `muse-js`) oraz OpenBCI Ganglion
+  (własna implementacja — patrz zastrzeżenie niżej). Wymaga Chrome/Edge na komputerze lub Androidzie; **nie działa
+  w Safari na iOS ani w Firefoksie**, bo te przeglądarki nie implementują Web Bluetooth.
 - **Postępy** — historia sesji, passa dni, statystyki i wykres aktywności.
 
 ## Uwagi dotyczące bezpieczeństwa
@@ -39,6 +43,14 @@ warto:
 - sprawdzić aktualne wytyczne Apple App Review i Google Play dotyczące treści z migającym światłem — recenzenci
   sklepów czasem wymagają dodatkowych zabezpieczeń lub odrzucają taką funkcję,
 - rozważyć niezależny przegląd/testy (np. zgodność z wytycznymi Harding FPA używanymi w telewizji).
+
+**Moduł "Urządzenia" — OpenBCI Ganglion.** Oficjalne SDK OpenBCI dla Ganglion (`@openbci/ganglion`) to biblioteka
+Node.js oparta o natywny Bluetooth i nie działa w przeglądarce, więc `src/lib/devices/ganglionEeg.ts` to własna
+implementacja połączenia BLE. Warstwa połączenia, komendy start/stop i pakiety nieskompresowane/akcelerometr są
+zaimplementowane pewnie na podstawie udokumentowanych, stabilnych faktów (UUID usługi/charakterystyk). Format
+**skompresowanych** próbek EEG (18-bitowa kompresja delta) jest bitowo znacznie bardziej złożony i **nie został
+zweryfikowany na prawdziwym urządzeniu** — takie pakiety są celowo zliczane jako „niezdekodowane", zamiast zgadywać
+algorytm i prezentować niepewne dane jako pewny sygnał. Do dopracowania z fizycznym Ganglionem w ręku.
 
 ## Uruchomienie
 
