@@ -66,6 +66,7 @@ export default function LightJourney() {
 
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const flickerRafRef = useRef<number | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const [torchSupported, setTorchSupported] = useState<boolean | null>(null);
   const [torchOn, setTorchOn] = useState(false);
@@ -81,6 +82,16 @@ export default function LightJourney() {
   };
 
   useEffect(() => () => clearAll(), []);
+
+  // Cały ekran (monitor lub telefon) jako źródło światła — działa identycznie na każdym
+  // sprzęcie, niezależnie od tego, czy urządzenie ma fizyczną lampę błyskową.
+  useEffect(() => {
+    if (running && containerRef.current) {
+      containerRef.current.requestFullscreen?.().catch(() => {});
+    } else if (!running && document.fullscreenElement) {
+      document.exitFullscreen?.().catch(() => {});
+    }
+  }, [running]);
 
   // Sterowanie faktycznym miganiem: bezpośrednia manipulacja DOM przez requestAnimationFrame
   // (zamiast animacji CSS) — daje pewność, że migotanie faktycznie się przełącza, a nie
@@ -239,42 +250,36 @@ export default function LightJourney() {
 
   if (running && modeRef.current === 'strobe') {
     return (
-      <div className="flex flex-col items-center gap-5">
+      <div ref={containerRef} className="fixed inset-0 z-50 select-none overflow-hidden" style={{ background: '#150f28' }}>
         <div
-          className="relative w-full select-none overflow-hidden rounded-3xl"
-          style={{ background: '#150f28', height: 'min(70vh, 560px)' }}
-        >
-          <div
-            ref={overlayRef}
-            className="absolute inset-0"
-            style={{
-              background:
-                'radial-gradient(70% 70% at 50% 50%, rgba(196,181,253,0.95) 0%, rgba(110,231,201,0.5) 55%, transparent 78%)',
-              opacity: 0.12,
-              willChange: 'opacity',
-            }}
-          />
-          <div className="relative flex h-full flex-col items-center justify-center gap-4 text-center">
-            <p className="tabular-nums text-white/60">{formatMMSS(Math.max(strobeMinutes * 60 - elapsedSec, 0))}</p>
-            <button
-              onPointerDown={() => setHolding(true)}
-              onPointerUp={() => setHolding(false)}
-              onPointerLeave={() => setHolding(false)}
-              onPointerCancel={() => setHolding(false)}
-              className="rounded-full border-2 border-white/40 bg-white/10 px-8 py-4 text-lg font-semibold text-white/90 backdrop-blur active:bg-white/20"
-            >
-              {holding ? 'Miga — puść, aby zatrzymać' : 'Przytrzymaj, aby migać'}
-            </button>
-            <p className="text-sm text-white/50">albo przytrzymaj spację · Esc = zakończ sesję</p>
-            {torchOn && <p className="text-xs text-amber-300/80">🔦 Lampa błyskowa miga razem ze światłem na ekranie</p>}
-          </div>
+          ref={overlayRef}
+          className="absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(70% 70% at 50% 50%, rgba(196,181,253,0.95) 0%, rgba(110,231,201,0.5) 55%, transparent 78%)',
+            opacity: 0.12,
+            willChange: 'opacity',
+          }}
+        />
+        <div className="relative z-10 flex h-full flex-col items-center justify-center gap-5 px-6 text-center">
+          <p className="tabular-nums text-white/60">{formatMMSS(Math.max(strobeMinutes * 60 - elapsedSec, 0))}</p>
+          <button
+            onPointerDown={() => setHolding(true)}
+            onPointerUp={() => setHolding(false)}
+            onPointerLeave={() => setHolding(false)}
+            onPointerCancel={() => setHolding(false)}
+            className="rounded-full border-2 border-white/40 bg-white/10 px-8 py-4 text-lg font-semibold text-white/90 backdrop-blur active:bg-white/20"
+          >
+            {holding ? 'Miga — puść, aby zatrzymać' : 'Przytrzymaj, aby migać'}
+          </button>
+          <p className="max-w-md text-sm text-white/50">
+            albo przytrzymaj spację · Esc = zakończ sesję · {strobeHz} Hz. Przy dyskomforcie puść od razu.
+          </p>
+          {torchOn && <p className="text-xs text-amber-300/80">🔦 Lampa błyskowa miga razem ze światłem na ekranie</p>}
+          <Button variant="secondary" onClick={stop}>
+            Zakończ sesję
+          </Button>
         </div>
-        <p className="max-w-md text-center text-sm text-[var(--color-muted)]">
-          {strobeHz} Hz. Jeśli poczujesz zawroty głowy, mdłości, dezorientację lub jakikolwiek dyskomfort — puść od razu.
-        </p>
-        <Button variant="secondary" onClick={stop}>
-          Zakończ sesję
-        </Button>
       </div>
     );
   }
@@ -282,24 +287,22 @@ export default function LightJourney() {
   if (running) {
     const t = THEMES[theme];
     return (
-      <div className="flex flex-col items-center gap-5">
-        <div className="relative w-full overflow-hidden rounded-3xl" style={{ background: t.base, height: 'min(70vh, 560px)' }}>
-          <div
-            className="light-pulse-overlay absolute inset-0"
-            style={{ background: t.glow, animation: `light-pulse ${cycleSec}s ease-in-out infinite` }}
-          />
-          <div className="relative flex h-full flex-col items-center justify-center gap-3 text-center">
-            <p className="text-2xl font-medium text-white/90 drop-shadow">{breathLabel}</p>
-            <p className="tabular-nums text-white/50">{formatMMSS(elapsedSec)}</p>
-          </div>
+      <div ref={containerRef} className="fixed inset-0 z-50 overflow-hidden" style={{ background: t.base }}>
+        <div
+          className="light-pulse-overlay absolute inset-0"
+          style={{ background: t.glow, animation: `light-pulse ${cycleSec}s ease-in-out infinite` }}
+        />
+        <div className="relative z-10 flex h-full flex-col items-center justify-center gap-4 px-6 text-center">
+          <p className="text-2xl font-medium text-white/90 drop-shadow">{breathLabel}</p>
+          <p className="tabular-nums text-white/50">{formatMMSS(elapsedSec)}</p>
+          <p className="max-w-md text-sm text-white/50">
+            Możesz zamknąć oczy, jeśli czujesz się z tym komfortowo, lub patrzeć łagodnie na światło. Przy dyskomforcie
+            otwórz oczy i przerwij.
+          </p>
+          <Button variant="secondary" onClick={stop}>
+            Zakończ
+          </Button>
         </div>
-        <p className="max-w-md text-center text-sm text-[var(--color-muted)]">
-          Możesz zamknąć oczy, jeśli czujesz się z tym komfortowo, lub patrzeć łagodnie na światło. Jeśli poczujesz
-          dyskomfort — otwórz oczy i przerwij.
-        </p>
-        <Button variant="secondary" onClick={stop}>
-          Zakończ
-        </Button>
       </div>
     );
   }
