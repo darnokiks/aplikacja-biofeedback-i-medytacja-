@@ -7,6 +7,7 @@ import Schultz from './pages/Schultz';
 import Meditation from './pages/Meditation';
 import Focus from './pages/Focus';
 import LightJourney from './pages/LightJourney';
+import Music from './pages/Music';
 import Games from './pages/Games';
 import ReactionGame from './pages/games/ReactionGame';
 import MemoryGame from './pages/games/MemoryGame';
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/medytacja" element={<Meditation />} />
           <Route path="/focus" element={<Focus />} />
           <Route path="/swiatlo" element={<LightJourney />} />
+          <Route path="/muzyka" element={<Music />} />
           <Route path="/gry" element={<Games />} />
           <Route path="/gry/reakcja" element={<ReactionGame />} />
           <Route path="/gry/pamiec" element={<MemoryGame />} />

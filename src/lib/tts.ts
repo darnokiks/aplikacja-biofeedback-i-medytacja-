@@ -3,14 +3,25 @@
 let plVoice: SpeechSynthesisVoice | null = null;
 let voicesLoaded = false;
 
+// Web Speech API zwykle udostępnia zarówno głosy lokalne (offline, syntetyczne, np. espeak) jak
+// i sieciowe/neuronowe (np. głosy Google w Chrome, "Microsoft ... Natural" w Edge) — te drugie
+// brzmią wyraźnie bardziej naturalnie. `localService: false` i nazwy z "Natural"/"Neural"/"Enhanced"
+// to najlepsze dostępne w przeglądarce sygnały jakości głosu, więc preferujemy je w tej kolejności.
+function scoreVoice(v: SpeechSynthesisVoice): number {
+  let score = 0;
+  if (!v.localService) score += 2;
+  if (/natural|neural|enhanced|premium/i.test(v.name)) score += 2;
+  if (v.default) score += 1;
+  return score;
+}
+
 function loadVoices() {
   if (!('speechSynthesis' in window)) return;
   const voices = window.speechSynthesis.getVoices();
   if (voices.length > 0) {
-    plVoice =
-      voices.find((v) => v.lang.toLowerCase().startsWith('pl')) ??
-      voices.find((v) => v.default) ??
-      voices[0];
+    const polish = voices.filter((v) => v.lang.toLowerCase().startsWith('pl'));
+    const pool = polish.length > 0 ? polish : voices;
+    plVoice = [...pool].sort((a, b) => scoreVoice(b) - scoreVoice(a))[0] ?? null;
     voicesLoaded = true;
   }
 }

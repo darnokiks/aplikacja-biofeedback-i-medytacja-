@@ -9,7 +9,8 @@
   --color-accent: #a78bfa;
   --color-text: #e6ecf5;
   --color-muted: #93a1b8;
-  --font-sans: "Segoe UI", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-sans: "Work Sans", "Segoe UI", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Fraunces", "Iowan Old Style", "Georgia", serif;
 }
 
 html,
@@ -28,6 +29,14 @@ body {
 
 * {
   box-sizing: border-box;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display);
+  text-wrap: balance;
 }
 
 ::selection {

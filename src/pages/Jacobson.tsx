@@ -15,13 +15,23 @@ export default function Jacobson() {
 
   const phases: GuidedPhase[] = useMemo(() => {
     const list: GuidedPhase[] = [
-      { title: 'Przygotowanie', instruction: JACOBSON_INTRO, durationSec: 10 },
+      { id: 'jacobson.intro', title: 'Przygotowanie', instruction: JACOBSON_INTRO, durationSec: 10 },
     ];
     for (const group of MUSCLE_GROUPS) {
-      list.push({ title: `${group.name} — napnij`, instruction: group.tenseInstruction, durationSec: tenseSec });
-      list.push({ title: `${group.name} — rozluźnij`, instruction: group.relaxInstruction, durationSec: relaxSec });
+      list.push({
+        id: `jacobson.${group.id}.tense`,
+        title: `${group.name} — napnij`,
+        instruction: group.tenseInstruction,
+        durationSec: tenseSec,
+      });
+      list.push({
+        id: `jacobson.${group.id}.relax`,
+        title: `${group.name} — rozluźnij`,
+        instruction: group.relaxInstruction,
+        durationSec: relaxSec,
+      });
     }
-    list.push({ title: 'Zakończenie', instruction: JACOBSON_OUTRO, durationSec: 12 });
+    list.push({ id: 'jacobson.outro', title: 'Zakończenie', instruction: JACOBSON_OUTRO, durationSec: 12 });
     return list;
   }, [tenseSec, relaxSec]);
 

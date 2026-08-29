@@ -14,9 +14,14 @@ function buildPhases(technique: MeditationTechnique, totalMinutes: number): Guid
   const contentSec = Math.max(totalMinutes * 60 - introSec - outroSec, technique.script.length * 15);
   const perLine = Math.round(contentSec / technique.script.length);
   return [
-    { title: 'Przygotowanie', instruction: technique.intro, durationSec: introSec },
-    ...technique.script.map((line, i) => ({ title: `Krok ${i + 1}`, instruction: line, durationSec: perLine })),
-    { title: 'Zakończenie', instruction: technique.outro, durationSec: outroSec },
+    { id: `meditation.${technique.id}.intro`, title: 'Przygotowanie', instruction: technique.intro, durationSec: introSec },
+    ...technique.script.map((line, i) => ({
+      id: `meditation.${technique.id}.step${i + 1}`,
+      title: `Krok ${i + 1}`,
+      instruction: line,
+      durationSec: perLine,
+    })),
+    { id: `meditation.${technique.id}.outro`, title: 'Zakończenie', instruction: technique.outro, durationSec: outroSec },
   ];
 }
 

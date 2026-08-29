@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button, Card, Pill, SectionTitle } from '../components/ui';
 import { BreathOrb } from '../components/BreathOrb';
-import { playBeep, playChime, startAmbientMusic, unlockAudio, type AmbientHandle } from '../lib/audio';
-import { speak } from '../lib/tts';
+import { AMBIENT_TRACKS, playBeep, playChime, startAmbientTrack, unlockAudio, type AmbientHandle } from '../lib/audio';
+import { speakNarration } from '../lib/narration';
 import { logSession } from '../lib/storage';
 import { formatMMSS } from '../hooks/useTimer';
 
@@ -23,6 +23,7 @@ export default function WimHof() {
   const [voiceOn, setVoiceOn] = useState(false);
   const [musicOn, setMusicOn] = useState(true);
   const [musicVolume, setMusicVolume] = useState(0.35);
+  const [musicTrack, setMusicTrack] = useState('heart-pulse');
 
   const [phase, setPhase] = useState<Phase>('setup');
   const [currentRound, setCurrentRound] = useState(1);
@@ -52,9 +53,9 @@ export default function WimHof() {
     [],
   );
 
-  function speakIfOn(text: string) {
+  function speakIfOn(id: string, text: string) {
     if (!voiceOn) return;
-    speak(text);
+    speakNarration(id, text);
   }
 
   function startSession() {
@@ -63,7 +64,7 @@ export default function WimHof() {
     setCurrentRound(1);
     if (musicOn) {
       musicRef.current?.stop();
-      musicRef.current = startAmbientMusic(musicVolume);
+      musicRef.current = startAmbientTrack(musicTrack, musicVolume);
     }
     startBreathingRound();
   }
@@ -82,7 +83,7 @@ export default function WimHof() {
       setHoldSeconds(0);
       holdSecondsRef.current = 0;
       playChime();
-      speakIfOn('Wypuść powietrze i zatrzymaj oddech tak długo, jak czujesz się komfortowo.');
+      speakIfOn('wimhof.hold-start', 'Wypuść powietrze i zatrzymaj oddech tak długo, jak czujesz się komfortowo.');
       intervalRef.current = window.setInterval(() => {
         holdSecondsRef.current += 1;
         setHoldSeconds(holdSecondsRef.current);
@@ -107,7 +108,7 @@ export default function WimHof() {
     setPhase('recovery');
     setRecoverySecondsLeft(recoveryHoldSec);
     playBeep(880, 0.1, 0.22);
-    speakIfOn('Weź głęboki wdech i zatrzymaj powietrze.');
+    speakIfOn('wimhof.recovery-start', 'Weź głęboki wdech i zatrzymaj powietrze.');
     let remaining = recoveryHoldSec;
     intervalRef.current = window.setInterval(() => {
       remaining -= 1;
@@ -240,16 +241,29 @@ export default function WimHof() {
                 Muzyka ambientowa w tle
               </label>
               {musicOn && (
-                <input
-                  type="range"
-                  min={0}
-                  max={0.8}
-                  step={0.05}
-                  value={musicVolume}
-                  onChange={(e) => onMusicVolumeChange(Number(e.target.value))}
-                  className="w-full accent-[var(--color-primary)]"
-                  aria-label="Głośność muzyki"
-                />
+                <div className="space-y-2">
+                  <select
+                    value={musicTrack}
+                    onChange={(e) => setMusicTrack(e.target.value)}
+                    className="w-full rounded-lg bg-[var(--color-surface-2)] px-3 py-2 text-sm text-[var(--color-text)]"
+                  >
+                    {AMBIENT_TRACKS.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.name}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="range"
+                    min={0}
+                    max={0.8}
+                    step={0.05}
+                    value={musicVolume}
+                    onChange={(e) => onMusicVolumeChange(Number(e.target.value))}
+                    className="w-full accent-[var(--color-primary)]"
+                    aria-label="Głośność muzyki"
+                  />
+                </div>
               )}
             </div>
             <Button className="w-full" onClick={startSession}>

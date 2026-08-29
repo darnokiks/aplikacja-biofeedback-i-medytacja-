@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button, Card, Pill, SectionTitle } from '../components/ui';
-import { startAmbientMusic, unlockAudio, type AmbientHandle } from '../lib/audio';
+import { AMBIENT_TRACKS, startAmbientTrack, unlockAudio, type AmbientHandle } from '../lib/audio';
 import { logSession } from '../lib/storage';
 import { formatMMSS } from '../hooks/useTimer';
 
@@ -51,6 +51,7 @@ export default function LightJourney() {
   const [strobeHz, setStrobeHz] = useState(6);
   const [strobeMinutes, setStrobeMinutes] = useState(5);
   const [musicOn, setMusicOn] = useState(true);
+  const [musicTrack, setMusicTrack] = useState('ocean-depth');
 
   const [running, setRunning] = useState(false);
   const [done, setDone] = useState(false);
@@ -194,7 +195,7 @@ export default function LightJourney() {
     elapsedRef.current = 0;
     setElapsedSec(0);
     setRunning(true);
-    if (musicOn) musicRef.current = startAmbientMusic(0.3);
+    if (musicOn) musicRef.current = startAmbientTrack(musicTrack, 0.3);
     runBreathLabel(true);
     intervalRef.current = window.setInterval(() => {
       elapsedRef.current += 1;
@@ -211,7 +212,7 @@ export default function LightJourney() {
     elapsedRef.current = 0;
     setElapsedSec(0);
     setRunning(true);
-    if (musicOn) musicRef.current = startAmbientMusic(0.25);
+    if (musicOn) musicRef.current = startAmbientTrack(musicTrack, 0.25);
     intervalRef.current = window.setInterval(() => {
       elapsedRef.current += 1;
       setElapsedSec(elapsedRef.current);
@@ -398,10 +399,25 @@ export default function LightJourney() {
                   </div>
                   <input type="range" min={5} max={20} step={5} value={minutes} onChange={(e) => setMinutes(Number(e.target.value))} className="w-full accent-[var(--color-primary)]" />
                 </div>
-                <label className="flex items-center gap-2 text-sm text-[var(--color-muted)]">
-                  <input type="checkbox" checked={musicOn} onChange={(e) => setMusicOn(e.target.checked)} className="accent-[var(--color-primary)]" />
-                  Muzyka ambientowa w tle
-                </label>
+                <div>
+                  <label className="mb-2 flex items-center gap-2 text-sm text-[var(--color-muted)]">
+                    <input type="checkbox" checked={musicOn} onChange={(e) => setMusicOn(e.target.checked)} className="accent-[var(--color-primary)]" />
+                    Muzyka ambientowa w tle
+                  </label>
+                  {musicOn && (
+                    <select
+                      value={musicTrack}
+                      onChange={(e) => setMusicTrack(e.target.value)}
+                      className="w-full rounded-lg bg-[var(--color-surface-2)] px-3 py-2 text-sm text-[var(--color-text)]"
+                    >
+                      {AMBIENT_TRACKS.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
                 <Button className="w-full" onClick={startGentle}>
                   Rozpocznij podróż
                 </Button>
@@ -477,10 +493,25 @@ export default function LightJourney() {
                     className="w-full accent-[var(--color-primary)]"
                   />
                 </div>
-                <label className="flex items-center gap-2 text-sm text-[var(--color-muted)]">
-                  <input type="checkbox" checked={musicOn} onChange={(e) => setMusicOn(e.target.checked)} className="accent-[var(--color-primary)]" />
-                  Muzyka ambientowa w tle
-                </label>
+                <div>
+                  <label className="mb-2 flex items-center gap-2 text-sm text-[var(--color-muted)]">
+                    <input type="checkbox" checked={musicOn} onChange={(e) => setMusicOn(e.target.checked)} className="accent-[var(--color-primary)]" />
+                    Muzyka ambientowa w tle
+                  </label>
+                  {musicOn && (
+                    <select
+                      value={musicTrack}
+                      onChange={(e) => setMusicTrack(e.target.value)}
+                      className="w-full rounded-lg bg-[var(--color-surface-2)] px-3 py-2 text-sm text-[var(--color-text)]"
+                    >
+                      {AMBIENT_TRACKS.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
 
                 <div className="rounded-xl bg-[var(--color-surface-2)] p-3">
                   <p className="mb-2 text-sm font-medium">🔦 Lampa błyskowa telefonu (eksperymentalne)</p>

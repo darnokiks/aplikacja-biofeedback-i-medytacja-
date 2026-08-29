@@ -23,7 +23,19 @@ Dane (historia sesji, wyniki gier) zapisywane są lokalnie w `localStorage`.
   usługą „Heart Rate" (np. Polar H10), headset EEG Muse 2/S (przez bibliotekę `muse-js`) oraz OpenBCI Ganglion
   (własna implementacja — patrz zastrzeżenie niżej). Wymaga Chrome/Edge na komputerze lub Androidzie; **nie działa
   w Safari na iOS ani w Firefoksie**, bo te przeglądarki nie implementują Web Bluetooth.
+- **Biblioteka muzyki** — sześć generatywnych utworów ambientowych (relaks/sen/skupienie/energia), w 100%
+  syntezowanych przez Web Audio API; wybór utworu jest też dostępny jako tło w Wim Hof i Podróży światła.
 - **Postępy** — historia sesji, passa dni, statystyki i wykres aktywności.
+
+## Głos i narracja
+
+Narracja korzysta z `src/lib/narration.ts`, który dla każdej frazy sprawdza najpierw, czy istnieje prawdziwe
+nagranie w `AUDIO_MANIFEST` (plik w `public/audio/narration/<id>.mp3`) — jeśli tak, odtwarza je; jeśli nie, korzysta
+z syntezy mowy przeglądarki (`src/lib/tts.ts`, z heurystyką preferującą głosy sieciowe/neuronowe, gdy dostępne).
+Identyfikatory fraz są stabilne (np. `jacobson.hands.tense`, `schultz.calm`, `wimhof.hold-start`) — żeby dodać
+prawdziwe nagranie, wrzuć plik audio pod odpowiednią nazwą i dopisz wpis do `AUDIO_MANIFEST`. Ta aplikacja **nie
+generuje ani nie zawiera nagrań prawdziwego ludzkiego głosu** — to wymaga albo nagrania własnego, albo płatnego
+serwisu TTS (np. ElevenLabs), do którego to środowisko nie ma dostępu.
 
 ## Uwagi dotyczące bezpieczeństwa
 

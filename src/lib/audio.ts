@@ -182,14 +182,97 @@ export interface AmbientHandle {
   setVolume: (v: number) => void;
 }
 
-// Akord zawieszony (sus2/add9) w niskim rejestrze — ciepłe, spokojne tło.
-const AMBIENT_CHORD_HZ = [98.0, 130.81, 146.83, 220.0];
+export type AmbientMood = 'relaks' | 'sen' | 'skupienie' | 'energia';
+
+export interface AmbientTrack {
+  id: string;
+  name: string;
+  mood: AmbientMood;
+  description: string;
+  chordHz: number[];
+  oscType: OscillatorType;
+  filterBase: number;
+  filterSweepPeriodSec: number;
+  noiseTexture?: NoiseColor;
+  pulseBpm?: number;
+}
+
+/** Biblioteka generatywnych utworów ambientowych — w 100% syntezowane, bez próbek/licencji. */
+export const AMBIENT_TRACKS: AmbientTrack[] = [
+  {
+    id: 'ocean-depth',
+    name: 'Głębia oceanu',
+    mood: 'sen',
+    description: 'Ciepły, niski akord zawieszony — na sen i głęboki relaks.',
+    chordHz: [98.0, 130.81, 146.83, 220.0],
+    oscType: 'triangle',
+    filterBase: 1200,
+    filterSweepPeriodSec: 24,
+  },
+  {
+    id: 'dawn',
+    name: 'Świt',
+    mood: 'skupienie',
+    description: 'Jaśniejszy akord dur — łagodne wybudzenie uwagi bez pobudzenia.',
+    chordHz: [130.81, 164.81, 196.0, 261.63],
+    oscType: 'sine',
+    filterBase: 1800,
+    filterSweepPeriodSec: 18,
+  },
+  {
+    id: 'deep-silence',
+    name: 'Cisza głębin',
+    mood: 'sen',
+    description: 'Bardzo niski dron, minimalny ruch — do zasypiania.',
+    chordHz: [65.41, 98.0, 130.81],
+    oscType: 'sine',
+    filterBase: 700,
+    filterSweepPeriodSec: 40,
+  },
+  {
+    id: 'golden-ray',
+    name: 'Złoty promień',
+    mood: 'relaks',
+    description: 'Ciepły akord dur z żywszym ruchem filtra — na popołudniowy relaks.',
+    chordHz: [110.0, 138.59, 164.81, 220.0],
+    oscType: 'triangle',
+    filterBase: 1500,
+    filterSweepPeriodSec: 14,
+  },
+  {
+    id: 'forest-rain',
+    name: 'Deszcz w lesie',
+    mood: 'relaks',
+    description: 'Pad z delikatną teksturą deszczu w tle.',
+    chordHz: [98.0, 123.47, 146.83, 196.0],
+    oscType: 'triangle',
+    filterBase: 1100,
+    filterSweepPeriodSec: 20,
+    noiseTexture: 'pink',
+  },
+  {
+    id: 'heart-pulse',
+    name: 'Puls serca',
+    mood: 'energia',
+    description: 'Powolne, rytmiczne tętnienie głośności — dobre tło do oddechu Wima Hofa.',
+    chordHz: [87.31, 110.0, 130.81, 174.61],
+    oscType: 'sawtooth',
+    filterBase: 900,
+    filterSweepPeriodSec: 22,
+    pulseBpm: 12,
+  },
+];
+
+export function getAmbientTrack(id: string): AmbientTrack {
+  return AMBIENT_TRACKS.find((t) => t.id === id) ?? AMBIENT_TRACKS[0];
+}
 
 /**
- * Generuje ewoluujące, ambientowe tło muzyczne (bez próbek, w 100% syntezowane).
+ * Odtwarza wybrany utwór z biblioteki ambientowej (bez próbek, w 100% syntezowane).
  * Warstwy detunowanych fal z wolnym LFO na głośności, dającym wrażenie "oddychającego" pada.
  */
-export function startAmbientMusic(volume = 0.35): AmbientHandle {
+export function startAmbientTrack(trackId: string, volume = 0.35): AmbientHandle {
+  const track = getAmbientTrack(trackId);
   const c = getCtx();
   const now = c.currentTime;
 
@@ -199,15 +282,15 @@ export function startAmbientMusic(volume = 0.35): AmbientHandle {
 
   const filter = c.createBiquadFilter();
   filter.type = 'lowpass';
-  filter.frequency.value = 1200;
+  filter.frequency.value = track.filterBase;
   filter.connect(master);
   master.connect(c.destination);
 
-  const voices: { osc: OscillatorNode; lfo: OscillatorNode }[] = [];
+  const stoppable: { stop: () => void }[] = [];
 
-  AMBIENT_CHORD_HZ.forEach((freq, i) => {
+  track.chordHz.forEach((freq, i) => {
     const osc = c.createOscillator();
-    osc.type = 'triangle';
+    osc.type = track.oscType;
     osc.frequency.value = freq;
     osc.detune.value = (i % 2 === 0 ? -1 : 1) * (4 + i * 2);
 
@@ -225,19 +308,44 @@ export function startAmbientMusic(volume = 0.35): AmbientHandle {
     osc.connect(voiceGain).connect(filter);
     osc.start(now);
     lfo.start(now);
-    voices.push({ osc, lfo });
+    stoppable.push({ stop: () => { osc.stop(); lfo.stop(); } });
   });
 
-  // bardzo wolny, cykliczny sweep filtru dla ruchu w tle (LFO zamiast jednorazowej rampy)
-  filter.frequency.value = 1200;
+  // wolny, cykliczny sweep filtru dla ruchu w tle (LFO zamiast jednorazowej rampy)
   const filterLfo = c.createOscillator();
   filterLfo.type = 'sine';
-  filterLfo.frequency.value = 1 / 24; // pełny cykl co ok. 24s
+  filterLfo.frequency.value = 1 / track.filterSweepPeriodSec;
   const filterLfoGain = c.createGain();
-  filterLfoGain.gain.value = 350;
+  filterLfoGain.gain.value = track.filterBase * 0.3;
   filterLfo.connect(filterLfoGain).connect(filter.frequency);
   filterLfo.start(now);
-  voices.push({ osc: filterLfo, lfo: filterLfo });
+  stoppable.push({ stop: () => filterLfo.stop() });
+
+  if (track.noiseTexture) {
+    const noiseSource = c.createBufferSource();
+    noiseSource.buffer = createNoiseBuffer(c, track.noiseTexture);
+    noiseSource.loop = true;
+    const noiseGain = c.createGain();
+    noiseGain.gain.value = 0.06;
+    const noiseFilter = c.createBiquadFilter();
+    noiseFilter.type = 'lowpass';
+    noiseFilter.frequency.value = 3000;
+    noiseSource.connect(noiseFilter).connect(noiseGain).connect(master);
+    noiseSource.start(now);
+    stoppable.push({ stop: () => noiseSource.stop() });
+  }
+
+  if (track.pulseBpm) {
+    // powolna, rytmiczna pulsacja głośności całego pada — "tętno" w tle
+    const pulseLfo = c.createOscillator();
+    pulseLfo.type = 'sine';
+    pulseLfo.frequency.value = track.pulseBpm / 60;
+    const pulseGain = c.createGain();
+    pulseGain.gain.value = volume * 0.18;
+    pulseLfo.connect(pulseGain).connect(master.gain);
+    pulseLfo.start(now);
+    stoppable.push({ stop: () => pulseLfo.stop() });
+  }
 
   let stopped = false;
   return {
@@ -248,12 +356,7 @@ export function startAmbientMusic(volume = 0.35): AmbientHandle {
       master.gain.cancelScheduledValues(t);
       master.gain.setValueAtTime(master.gain.value, t);
       master.gain.linearRampToValueAtTime(0, t + 1.2);
-      setTimeout(() => {
-        voices.forEach(({ osc, lfo }) => {
-          osc.stop();
-          lfo.stop();
-        });
-      }, 1300);
+      setTimeout(() => stoppable.forEach((n) => n.stop()), 1300);
     },
     setVolume: (v: number) => {
       master.gain.setTargetAtTime(v, c.currentTime, 0.2);

@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button, Pill, ProgressRing } from './ui';
 import { playBeep, playChime } from '../lib/audio';
-import { speak, cancelSpeech } from '../lib/tts';
+import { speakNarration, stopNarration } from '../lib/narration';
 
 export interface GuidedPhase {
+  /** Stabilny identyfikator frazy — pozwala podmienić syntezę mowy na prawdziwe nagranie. */
+  id: string;
   title: string;
   instruction: string;
   durationSec: number;
@@ -53,7 +55,7 @@ export function GuidedPlayer({
   function goToPhase(i: number) {
     if (i >= phases.length) {
       clear();
-      cancelSpeech();
+      stopNarration();
       playChime();
       onComplete(elapsedRef.current);
       return;
@@ -63,7 +65,7 @@ export function GuidedPlayer({
     secondsRef.current = dur;
     setSecondsLeft(dur);
     playBeep(700, 0.08, 0.16);
-    if (voiceOn) speak(phases[i].instruction);
+    if (voiceOn) speakNarration(phases[i].id, phases[i].instruction);
     runInterval();
   }
 
@@ -71,7 +73,7 @@ export function GuidedPlayer({
     goToPhase(0);
     return () => {
       clear();
-      cancelSpeech();
+      stopNarration();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -83,13 +85,13 @@ export function GuidedPlayer({
     } else {
       setPaused(true);
       clear();
-      cancelSpeech();
+      stopNarration();
     }
   }
 
   function skip() {
     clear();
-    cancelSpeech();
+    stopNarration();
     goToPhase(index + 1);
   }
 

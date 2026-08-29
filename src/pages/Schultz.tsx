@@ -13,11 +13,11 @@ export default function Schultz() {
   const [done, setDone] = useState(false);
 
   const phases: GuidedPhase[] = useMemo(() => {
-    const list: GuidedPhase[] = [{ title: 'Przygotowanie', instruction: SCHULTZ_INTRO, durationSec: 15 }];
+    const list: GuidedPhase[] = [{ id: 'schultz.intro', title: 'Przygotowanie', instruction: SCHULTZ_INTRO, durationSec: 15 }];
     for (const formula of SCHULTZ_FORMULAS) {
-      list.push({ title: formula.name, instruction: formula.text, durationSec: formulaSec });
+      list.push({ id: `schultz.${formula.id}`, title: formula.name, instruction: formula.text, durationSec: formulaSec });
     }
-    list.push({ title: 'Powrót do czujności', instruction: SCHULTZ_RETURN, durationSec: 15 });
+    list.push({ id: 'schultz.return', title: 'Powrót do czujności', instruction: SCHULTZ_RETURN, durationSec: 15 });
     return list;
   }, [formulaSec]);
 
