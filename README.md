@@ -16,14 +16,29 @@ Dane (historia sesji, wyniki gier) zapisywane są lokalnie w `localStorage`.
 - **Focus / Relaks / Sen** — dźwięki koncentracji w stylu brain.fm: fale binauralne i szum tła generowane na żywo
   przez Web Audio API (wymagane słuchawki).
 - **Trening mózgu** — gry poznawcze w stylu Lumosity: czas reakcji, sekwencje pamięciowe i N-back.
+- **Podróż światła** — pulsujące światło w rytmie oddechu (tryb łagodny) oraz opcjonalny tryb stroboskopu z
+  ograniczoną częstotliwością i zabezpieczeniami (patrz niżej), inspirowane light-journey (np. Lumenate).
 - **Biofeedback** — eksperymentalny pomiar tętna z kamery (rPPG) oraz pacer oddechowy (koherentny, pudełkowy, 4-7-8).
 - **Postępy** — historia sesji, passa dni, statystyki i wykres aktywności.
 
 ## Uwagi dotyczące bezpieczeństwa
 
-Aplikacja ma charakter edukacyjno-relaksacyjny i **nie zastępuje porady medycznej**. Moduł biofeedback nie jest
-urządzeniem medycznym — pomiar tętna z kamery jest orientacyjny. Techniki oddechowe (zwłaszcza Wim Hof) należy
-wykonywać w bezpiecznej pozycji, nigdy w wodzie ani podczas prowadzenia pojazdu.
+Aplikacja ma charakter edukacyjno-relaksacyjny i **nie zastępuje porady medycznej**. Nie opisuj jej ani jej modułów
+jako "leczniczych" czy terapeutycznych w treściach marketingowych — to nieprawdziwe twierdzenie medyczne. Moduł
+biofeedback nie jest urządzeniem medycznym — pomiar tętna z kamery jest orientacyjny. Techniki oddechowe (zwłaszcza
+Wim Hof) należy wykonywać w bezpiecznej pozycji, nigdy w wodzie ani podczas prowadzenia pojazdu.
+
+**Moduł "Podróż światła" — tryb stroboskopu.** Ten tryb generuje prawdziwie migające światło (2–12 Hz) i celowo
+ogranicza częstotliwość poniżej najbardziej ryzykownego dla padaczki światłoczułej pasma 15–20 Hz. Zawiera skrining
+(kilka pytań przesiewowych zamiast jednego checkboxa), wyłącznik działający tylko przy przytrzymaniu (puszczenie
+natychmiast zatrzymuje miganie), limit długości sesji i unikanie czerwieni/pełnego kontrastu. **To nie eliminuje
+ryzyka, tylko je ogranicza.** Przed publicznym udostępnieniem tej funkcji (App Store/Google Play, szeroka publika)
+warto:
+- skonsultować treść ostrzeżeń i mechanizm zgody z prawnikiem (odpowiedzialność za treści migające różni się
+  jurysdykcyjnie),
+- sprawdzić aktualne wytyczne Apple App Review i Google Play dotyczące treści z migającym światłem — recenzenci
+  sklepów czasem wymagają dodatkowych zabezpieczeń lub odrzucają taką funkcję,
+- rozważyć niezależny przegląd/testy (np. zgodność z wytycznymi Harding FPA używanymi w telewizji).
 
 ## Uruchomienie
 
@@ -33,6 +48,36 @@ npm run dev       # tryb deweloperski
 npm run build     # build produkcyjny
 npm run preview   # podgląd builda produkcyjnego
 ```
+
+## Aplikacja mobilna (Android / iOS)
+
+Projekt jest przygotowany jako PWA (instalowalna z przeglądarki, `manifest.webmanifest` + ikony w `public/icons`)
+oraz opakowany w [Capacitor](https://capacitorjs.com) do budowy natywnych aplikacji. Szkielety projektów Android
+(`android/`) i iOS (`ios/`) są już w repo — **budowanie natywnych binarek wymaga jednak narzędzi, których nie ma w
+tym środowisku (sandboxie Claude Code)**: Android Studio + Android SDK dla Androida, oraz macOS + Xcode dla iOS.
+
+Zanim opublikujesz w sklepach, zmień `appId` w `capacitor.config.ts` z placeholdera `com.example.spokoj` na docelowy,
+unikalny identyfikator.
+
+**Android** (wymaga [Android Studio](https://developer.android.com/studio) na dowolnym systemie):
+```bash
+npm run android:open   # buduje web app, synchronizuje z Capacitor, otwiera Android Studio
+# w Android Studio: Build > Generate Signed App Bundle/APK
+```
+
+**iOS** (wymaga Maca z zainstalowanym Xcode; opcjonalnie CI w chmurze jak Codemagic/EAS/GitHub Actions macOS, jeśli
+nie masz Maca):
+```bash
+npm run ios:open       # buduje web app, synchronizuje z Capacitor, otwiera Xcode
+# w Xcode: podpisz zespołem deweloperskim (Apple Developer Program, 99$/rok) i zarchiwizuj do App Store Connect
+```
+
+Po każdej zmianie w `src/` przed testowaniem na urządzeniu/emulatorze uruchom `npm run cap:sync`, żeby przekopiować
+świeży build do natywnych projektów.
+
+**Uwaga do publikacji:** oba sklepy (Apple App Store, Google Play) mają zasady dotyczące treści mogących wywołać
+napady u osób światłoczułych — przed wysłaniem do recenzji sprawdź aktualne wytyczne obu platform dla modułu
+stroboskopu (patrz sekcja bezpieczeństwa wyżej).
 
 ## Stos technologiczny
 
