@@ -7,6 +7,15 @@ import { formatMMSS } from '../hooks/useTimer';
 type ThemeId = 'depth' | 'dawn';
 type Mode = 'gentle' | 'strobe';
 
+// Sterowanie lampą błyskową (torch) to nieoficjalne rozszerzenie MediaTrackCapabilities/
+// MediaTrackConstraintSet, więc brak go w standardowych typach lib.dom.
+interface TorchCapabilities extends MediaTrackCapabilities {
+  torch?: boolean;
+}
+interface TorchConstraintSet extends MediaTrackConstraintSet {
+  torch?: boolean;
+}
+
 const THEMES: Record<ThemeId, { name: string; base: string; glow: string }> = {
   depth: {
     name: 'Głębia (indygo)',
@@ -55,14 +64,88 @@ export default function LightJourney() {
   const elapsedRef = useRef(0);
   const modeRef = useRef<Mode>('gentle');
 
+  const overlayRef = useRef<HTMLDivElement | null>(null);
+  const flickerRafRef = useRef<number | null>(null);
+
+  const [torchSupported, setTorchSupported] = useState<boolean | null>(null);
+  const [torchOn, setTorchOn] = useState(false);
+  const torchTrackRef = useRef<MediaStreamTrack | null>(null);
+
   const clearAll = () => {
     if (intervalRef.current) window.clearInterval(intervalRef.current);
     if (breathTimeoutRef.current) window.clearTimeout(breathTimeoutRef.current);
+    if (flickerRafRef.current) cancelAnimationFrame(flickerRafRef.current);
     musicRef.current?.stop();
     musicRef.current = null;
+    releaseTorch();
   };
 
   useEffect(() => () => clearAll(), []);
+
+  // Sterowanie faktycznym miganiem: bezpośrednia manipulacja DOM przez requestAnimationFrame
+  // (zamiast animacji CSS) — daje pewność, że migotanie faktycznie się przełącza, a nie
+  // zamraża na jednej klatce przy nieprawidłowej wartości timing-function.
+  useEffect(() => {
+    if (!running || modeRef.current !== 'strobe') return;
+    if (!holding) {
+      if (overlayRef.current) overlayRef.current.style.opacity = '0.15';
+      setTorchState(false);
+      return;
+    }
+    const periodMs = 1000 / strobeHz;
+    let lastOn: boolean | null = null;
+    const start = performance.now();
+
+    function tick(now: number) {
+      const phase = (now - start) % periodMs;
+      const on = phase < periodMs / 2;
+      if (on !== lastOn) {
+        lastOn = on;
+        if (overlayRef.current) overlayRef.current.style.opacity = on ? '1' : '0.12';
+        if (torchOn) setTorchState(on);
+      }
+      flickerRafRef.current = requestAnimationFrame(tick);
+    }
+    flickerRafRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (flickerRafRef.current) cancelAnimationFrame(flickerRafRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [holding, running, strobeHz, torchOn]);
+
+  function setTorchState(on: boolean) {
+    const track = torchTrackRef.current;
+    if (!track) return;
+    track.applyConstraints({ advanced: [{ torch: on } as TorchConstraintSet] }).catch(() => {});
+  }
+
+  function releaseTorch() {
+    const track = torchTrackRef.current;
+    if (track) {
+      track.applyConstraints({ advanced: [{ torch: false } as TorchConstraintSet] }).catch(() => {});
+      track.stop();
+      torchTrackRef.current = null;
+    }
+    setTorchOn(false);
+  }
+
+  async function enableTorch() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } } });
+      const track = stream.getVideoTracks()[0];
+      const capabilities = track.getCapabilities?.() as TorchCapabilities | undefined;
+      if (!capabilities || !('torch' in capabilities)) {
+        setTorchSupported(false);
+        stream.getTracks().forEach((t) => t.stop());
+        return;
+      }
+      torchTrackRef.current = track;
+      setTorchSupported(true);
+      setTorchOn(true);
+    } catch {
+      setTorchSupported(false);
+    }
+  }
 
   // wyłącznik martwej ręki dla trybu stroboskopu: spacja lub Escape
   useEffect(() => {
@@ -155,7 +238,6 @@ export default function LightJourney() {
   const allScreeningChecked = screeningChecks.every(Boolean);
 
   if (running && modeRef.current === 'strobe') {
-    const periodMs = Math.round(1000 / strobeHz);
     return (
       <div className="flex flex-col items-center gap-5">
         <div
@@ -163,16 +245,13 @@ export default function LightJourney() {
           style={{ background: '#150f28', height: 'min(70vh, 560px)' }}
         >
           <div
+            ref={overlayRef}
             className="absolute inset-0"
             style={{
               background:
                 'radial-gradient(70% 70% at 50% 50%, rgba(196,181,253,0.95) 0%, rgba(110,231,201,0.5) 55%, transparent 78%)',
-              animationName: 'strobe-flicker',
-              animationDuration: `${periodMs}ms`,
-              animationTimingFunction: 'steps(1, jump-none)',
-              animationIterationCount: 'infinite',
-              animationPlayState: holding ? 'running' : 'paused',
-              opacity: holding ? undefined : 0.18,
+              opacity: 0.12,
+              willChange: 'opacity',
             }}
           />
           <div className="relative flex h-full flex-col items-center justify-center gap-4 text-center">
@@ -187,6 +266,7 @@ export default function LightJourney() {
               {holding ? 'Miga — puść, aby zatrzymać' : 'Przytrzymaj, aby migać'}
             </button>
             <p className="text-sm text-white/50">albo przytrzymaj spację · Esc = zakończ sesję</p>
+            {torchOn && <p className="text-xs text-amber-300/80">🔦 Lampa błyskowa miga razem ze światłem na ekranie</p>}
           </div>
         </div>
         <p className="max-w-md text-center text-sm text-[var(--color-muted)]">
@@ -398,6 +478,34 @@ export default function LightJourney() {
                   <input type="checkbox" checked={musicOn} onChange={(e) => setMusicOn(e.target.checked)} className="accent-[var(--color-primary)]" />
                   Muzyka ambientowa w tle
                 </label>
+
+                <div className="rounded-xl bg-[var(--color-surface-2)] p-3">
+                  <p className="mb-2 text-sm font-medium">🔦 Lampa błyskowa telefonu (eksperymentalne)</p>
+                  {torchSupported === null && (
+                    <>
+                      <p className="mb-2 text-xs text-[var(--color-muted)]">
+                        Działa tylko na niektórych telefonach z Androidem w Chrome (tylna kamera). Nie działa na
+                        iPhone/Safari ani na komputerze — tam miga wyłącznie ekran.
+                      </p>
+                      <Button variant="secondary" onClick={enableTorch} className="w-full">
+                        Spróbuj włączyć lampę błyskową
+                      </Button>
+                    </>
+                  )}
+                  {torchSupported === false && (
+                    <p className="text-xs text-rose-300">
+                      To urządzenie/przeglądarka nie obsługuje sterowania lampą błyskową ze strony internetowej.
+                      Będzie migać tylko ekran.
+                    </p>
+                  )}
+                  {torchSupported === true && (
+                    <label className="flex items-center gap-2 text-sm text-[var(--color-muted)]">
+                      <input type="checkbox" checked={torchOn} onChange={(e) => (e.target.checked ? setTorchOn(true) : releaseTorch())} className="accent-[var(--color-primary)]" />
+                      Lampa błyskowa włączona — będzie migać razem z ekranem
+                    </label>
+                  )}
+                </div>
+
                 <Button className="w-full" onClick={startStrobe}>
                   Rozpocznij (przytrzymaj, aby migać)
                 </Button>
