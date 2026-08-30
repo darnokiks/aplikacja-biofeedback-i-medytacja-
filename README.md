@@ -51,7 +51,7 @@ Auto-start porannej rutyny po wyłączeniu budzika jest obecnie podpięty tylko 
 (`useLocation().state?.autoStart` w `src/pages/WimHof.tsx`) — dodanie tego do kolejnych modułów wymaga tej samej,
 prostej zmiany w danym komponencie.
 
-## Głos i narracja
+## Głos, narracja i muzyka
 
 Narracja korzysta z `src/lib/narration.ts`, który dla każdej frazy sprawdza najpierw, czy istnieje prawdziwe
 nagranie w `AUDIO_MANIFEST` (plik w `public/audio/narration/<id>.mp3`) — jeśli tak, odtwarza je; jeśli nie, korzysta
@@ -60,6 +60,11 @@ Identyfikatory fraz są stabilne (np. `jacobson.hands.tense`, `schultz.calm`, `w
 prawdziwe nagranie, wrzuć plik audio pod odpowiednią nazwą i dopisz wpis do `AUDIO_MANIFEST`. Ta aplikacja **nie
 generuje ani nie zawiera nagrań prawdziwego ludzkiego głosu** — to wymaga albo nagrania własnego, albo płatnego
 serwisu TTS (np. ElevenLabs), do którego to środowisko nie ma dostępu.
+
+Biblioteka muzyki ambientowej działa analogicznie: `startAmbientTrack()` w `src/lib/audio.ts` sprawdza
+`MUSIC_MANIFEST` i odtwarza prawdziwy plik z `public/audio/music/<id>.mp3`, jeśli jest dostępny, w przeciwnym razie
+generuje utwór w 100% syntetycznie. Oba manifesty są dziś puste — folder `public/audio/` to gotowe miejsce na
+przyszłe nagrania i muzykę, z pełną listą oczekiwanych nazw plików w `public/audio/README.md`.
 
 ## Uwagi dotyczące bezpieczeństwa
 

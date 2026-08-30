@@ -267,12 +267,81 @@ export function getAmbientTrack(id: string): AmbientTrack {
   return AMBIENT_TRACKS.find((t) => t.id === id) ?? AMBIENT_TRACKS[0];
 }
 
+// Repozytorium prawdziwej muzyki: jeśli dla danego ID utworu istnieje nagrany plik w
+// public/audio/music/<id>.mp3, dopisz go tutaj — startAmbientTrack odtworzy go w pętli
+// zamiast generować dźwięk syntetycznie. Brak wpisu lub błąd wczytania pliku -> uczciwy
+// fallback na syntezę (ten sam wzorzec, co AUDIO_MANIFEST w lib/narration.ts).
+const MUSIC_MANIFEST: Record<string, string> = {
+  // 'ocean-depth': '/audio/music/ocean-depth.mp3',
+};
+
+export function hasRecordedTrack(id: string): boolean {
+  return id in MUSIC_MANIFEST;
+}
+
 /**
- * Odtwarza wybrany utwór z biblioteki ambientowej (bez próbek, w 100% syntezowane).
- * Warstwy detunowanych fal z wolnym LFO na głośności, dającym wrażenie "oddychającego" pada.
+ * Odtwarza wybrany utwór z biblioteki ambientowej: prawdziwe nagranie, jeśli jest dostępne
+ * w MUSIC_MANIFEST, w przeciwnym razie w 100% syntezowany pad (patrz startSynthAmbientTrack).
  */
 export function startAmbientTrack(trackId: string, volume = 0.35): AmbientHandle {
   const track = getAmbientTrack(trackId);
+  const recordedSrc = MUSIC_MANIFEST[trackId];
+  if (recordedSrc) {
+    return startRecordedAmbientTrack(recordedSrc, volume, () => startSynthAmbientTrack(track, volume));
+  }
+  return startSynthAmbientTrack(track, volume);
+}
+
+/** Odtwarza nagrany plik muzyczny w pętli przez Web Audio, z tym samym fade-in/out co synteza. */
+function startRecordedAmbientTrack(src: string, volume: number, fallback: () => AmbientHandle): AmbientHandle {
+  const c = getCtx();
+  const el = new Audio(src);
+  el.loop = true;
+  const source = c.createMediaElementSource(el);
+  const gain = c.createGain();
+  gain.gain.setValueAtTime(0, c.currentTime);
+  source.connect(gain).connect(c.destination);
+
+  let active: AmbientHandle = {
+    stop: () => {
+      const t = c.currentTime;
+      gain.gain.cancelScheduledValues(t);
+      gain.gain.setValueAtTime(gain.gain.value, t);
+      gain.gain.linearRampToValueAtTime(0, t + 1.2);
+      setTimeout(() => {
+        el.pause();
+        source.disconnect();
+        gain.disconnect();
+      }, 1300);
+    },
+    setVolume: (v: number) => gain.gain.setTargetAtTime(v, c.currentTime, 0.2),
+  };
+  let switchedToFallback = false;
+
+  function useFallback() {
+    if (switchedToFallback) return;
+    switchedToFallback = true;
+    source.disconnect();
+    gain.disconnect();
+    active = fallback();
+  }
+
+  el.onerror = useFallback; // plik brakuje/uszkodzony
+  el.play()
+    .then(() => gain.gain.linearRampToValueAtTime(volume, c.currentTime + 2.5))
+    .catch(useFallback); // np. przeglądarka zablokowała autoplay bez wcześniejszego gestu
+
+  return {
+    stop: () => active.stop(),
+    setVolume: (v: number) => active.setVolume(v),
+  };
+}
+
+/**
+ * Generuje wybrany utwór z biblioteki ambientowej w 100% syntetycznie (bez próbek/licencji).
+ * Warstwy detunowanych fal z wolnym LFO na głośności, dającym wrażenie "oddychającego" pada.
+ */
+function startSynthAmbientTrack(track: AmbientTrack, volume: number): AmbientHandle {
   const c = getCtx();
   const now = c.currentTime;
 
