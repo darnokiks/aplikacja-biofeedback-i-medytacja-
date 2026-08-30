@@ -142,8 +142,8 @@ export default function Home() {
   return (
     <div>
       <div className="relative mb-10 overflow-hidden rounded-3xl border border-white/5 bg-gradient-to-br from-[var(--color-surface)] to-[var(--color-bg)] px-6 py-10 sm:px-10 sm:py-14">
-        <div className="pointer-events-none absolute -top-24 -right-20 h-80 w-80 rounded-full bg-[var(--color-primary)]/40 blur-[80px]" />
-        <div className="pointer-events-none absolute -bottom-28 -left-14 h-72 w-72 rounded-full bg-[var(--color-accent)]/35 blur-[80px]" />
+        <div className="pointer-events-none absolute -top-24 -right-20 h-80 w-80 rounded-full bg-[var(--color-primary)]/30 blur-[80px]" />
+        <div className="pointer-events-none absolute -bottom-28 -left-14 h-72 w-72 rounded-full bg-[var(--color-accent)]/26 blur-[80px]" />
         <div className="relative">
           <SectionTitle
             eyebrow="Witaj ponownie"

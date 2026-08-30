@@ -24,9 +24,9 @@ body,
    przewija się z treścią. Karty mają własne, nieprzezroczyste tło, więc mocniejsza poświata
    nie obniża czytelności tekstu — widać ją tylko w przestrzeniach między elementami. */
 body {
-  background: radial-gradient(1100px 900px at 10% -10%, rgba(110, 231, 201, 0.45) 0%, transparent 55%),
-    radial-gradient(1100px 900px at 92% 105%, rgba(167, 139, 250, 0.4) 0%, transparent 55%),
-    radial-gradient(800px 700px at 50% 45%, rgba(110, 231, 201, 0.12) 0%, transparent 65%),
+  background: radial-gradient(1100px 900px at 10% -10%, rgba(110, 231, 201, 0.34) 0%, transparent 55%),
+    radial-gradient(1100px 900px at 92% 105%, rgba(167, 139, 250, 0.3) 0%, transparent 55%),
+    radial-gradient(800px 700px at 50% 45%, rgba(110, 231, 201, 0.09) 0%, transparent 65%),
     radial-gradient(1200px 800px at 20% -10%, #16213f 0%, #0b1120 55%),
     #0b1120;
   background-attachment: fixed;
