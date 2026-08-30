@@ -1,16 +1,18 @@
 import { useState } from 'react';
+import { Flame, type LucideIcon } from 'lucide-react';
 import { Button, Card, SectionTitle } from '../components/ui';
+import { ROUTE_ICONS } from '../lib/icons';
 import { clearSessions, getCategoryTotals, getSessions, getSessionsByDay, getStreak, getTotalMinutes } from '../lib/storage';
 
-const CATEGORY_LABELS: Record<string, { name: string; icon: string }> = {
-  wimhof: { name: 'Wim Hof', icon: '🌬️' },
-  jacobson: { name: 'Jacobson', icon: '🧎' },
-  schultz: { name: 'Schultz', icon: '🕯️' },
-  meditation: { name: 'Medytacja', icon: '🧘' },
-  focus: { name: 'Focus/Sen', icon: '🎧' },
-  light: { name: 'Podróż światła', icon: '✨' },
-  biofeedback: { name: 'Biofeedback', icon: '❤️' },
-  game: { name: 'Gry', icon: '🧠' },
+const CATEGORY_LABELS: Record<string, { name: string; icon: LucideIcon }> = {
+  wimhof: { name: 'Wim Hof', icon: ROUTE_ICONS['/oddech'] },
+  jacobson: { name: 'Jacobson', icon: ROUTE_ICONS['/jacobson'] },
+  schultz: { name: 'Schultz', icon: ROUTE_ICONS['/schultz'] },
+  meditation: { name: 'Medytacja', icon: ROUTE_ICONS['/medytacja'] },
+  focus: { name: 'Focus/Sen', icon: ROUTE_ICONS['/focus'] },
+  light: { name: 'Podróż światła', icon: ROUTE_ICONS['/swiatlo'] },
+  biofeedback: { name: 'Biofeedback', icon: ROUTE_ICONS['/biofeedback'] },
+  game: { name: 'Gry', icon: ROUTE_ICONS['/gry'] },
 };
 
 export default function Progress() {
@@ -38,7 +40,9 @@ export default function Progress() {
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Card>
           <p className="text-sm text-[var(--color-muted)]">Passa dni</p>
-          <p className="mt-1 text-3xl font-bold text-[var(--color-primary)]">{streak} 🔥</p>
+          <p className="mt-1 flex items-center gap-1.5 text-3xl font-bold text-[var(--color-primary)]">
+            {streak} <Flame className="h-6 w-6" aria-hidden />
+          </p>
         </Card>
         <Card>
           <p className="text-sm text-[var(--color-muted)]">Łączny czas</p>
@@ -67,13 +71,16 @@ export default function Progress() {
       </Card>
 
       <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        {Object.entries(totals).map(([key, count]) => (
-          <Card key={key} className="text-center">
-            <p className="text-2xl">{CATEGORY_LABELS[key]?.icon}</p>
-            <p className="mt-1 text-xl font-bold">{count}</p>
-            <p className="text-xs text-[var(--color-muted)]">{CATEGORY_LABELS[key]?.name}</p>
-          </Card>
-        ))}
+        {Object.entries(totals).map(([key, count]) => {
+          const Icon = CATEGORY_LABELS[key]?.icon;
+          return (
+            <Card key={key} className="text-center">
+              {Icon && <Icon className="mx-auto h-6 w-6 text-[var(--color-primary)]" aria-hidden />}
+              <p className="mt-1 text-xl font-bold">{count}</p>
+              <p className="text-xs text-[var(--color-muted)]">{CATEGORY_LABELS[key]?.name}</p>
+            </Card>
+          );
+        })}
       </div>
 
       <Card>
@@ -89,10 +96,12 @@ export default function Progress() {
           <p className="text-sm text-[var(--color-muted)]">Brak jeszcze zapisanych sesji. Zacznij od dowolnego modułu!</p>
         ) : (
           <div className="scrollbar-thin max-h-96 space-y-2 overflow-y-auto">
-            {recent.map((s) => (
+            {recent.map((s) => {
+              const Icon = CATEGORY_LABELS[s.category]?.icon;
+              return (
               <div key={s.id} className="flex items-center justify-between rounded-lg bg-[var(--color-surface-2)] px-3 py-2 text-sm">
                 <div className="flex items-center gap-2">
-                  <span>{CATEGORY_LABELS[s.category]?.icon}</span>
+                  {Icon && <Icon className="h-4 w-4 text-[var(--color-muted)]" aria-hidden />}
                   <span>{s.label}</span>
                 </div>
                 <div className="flex items-center gap-3 text-[var(--color-muted)]">
@@ -100,7 +109,8 @@ export default function Progress() {
                   <span>{new Date(s.completedAt).toLocaleDateString('pl-PL')}</span>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </Card>

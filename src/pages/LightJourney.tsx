@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Ban, Flashlight, Sparkles } from 'lucide-react';
 import { Button, Card, Pill, SectionTitle } from '../components/ui';
 import { AMBIENT_TRACKS, startAmbientTrack, unlockAudio, type AmbientHandle } from '../lib/audio';
 import { logSession } from '../lib/storage';
@@ -276,7 +277,7 @@ export default function LightJourney() {
           <p className="max-w-md text-sm text-white/50">
             albo przytrzymaj spację · Esc = zakończ sesję · {strobeHz} Hz. Przy dyskomforcie puść od razu.
           </p>
-          {torchOn && <p className="text-xs text-amber-300/80">🔦 Lampa błyskowa miga razem ze światłem na ekranie</p>}
+          {torchOn && <p className="flex items-center gap-1.5 text-xs text-amber-300/80"><Flashlight className="h-3.5 w-3.5" aria-hidden /> Lampa błyskowa miga razem ze światłem na ekranie</p>}
           <Button variant="secondary" onClick={stop}>
             Zakończ sesję
           </Button>
@@ -311,7 +312,7 @@ export default function LightJourney() {
   if (done) {
     return (
       <Card className="mx-auto max-w-md text-center">
-        <p className="text-3xl">✨</p>
+        <Sparkles className="mx-auto h-8 w-8 text-[var(--color-primary)]" aria-hidden />
         <p className="mt-2 text-lg font-semibold">Sesja zakończona</p>
         <p className="mt-1 text-[var(--color-muted)]">
           {modeRef.current === 'strobe'
@@ -351,8 +352,8 @@ export default function LightJourney() {
       {mode === 'gentle' ? (
         <>
           <Card className="mb-6 border-rose-400/25 bg-rose-400/5">
-            <p className="text-sm text-rose-200">
-              🚫 <strong>Nie używaj, jeśli masz padaczkę światłoczułą, migreny wywoływane światłem lub inne schorzenia
+            <p className="flex items-start gap-2 text-sm text-rose-200">
+              <Ban className="mt-0.5 h-4 w-4 shrink-0" aria-hidden /> <strong>Nie używaj, jeśli masz padaczkę światłoczułą, migreny wywoływane światłem lub inne schorzenia
               neurologiczne wrażliwe na bodźce wizualne.</strong> Światło pulsuje bardzo wolno (pełny cykl trwa {cycleSec}s).
               Jeśli poczujesz zawroty głowy, mdłości lub dyskomfort — natychmiast zakończ sesję.
             </p>
@@ -432,8 +433,8 @@ export default function LightJourney() {
       ) : (
         <>
           <Card className="mb-6 border-rose-400/30 bg-rose-500/10">
-            <p className="text-sm text-rose-200">
-              🚫 <strong>Prawdziwe miganie światła — realne ryzyko napadu padaczki światłoczułej.</strong> Nie używaj przy
+            <p className="flex items-start gap-2 text-sm text-rose-200">
+              <Ban className="mt-0.5 h-4 w-4 shrink-0" aria-hidden /> <strong>Prawdziwe miganie światła — realne ryzyko napadu padaczki światłoczułej.</strong> Nie używaj przy
               padaczce (własnej lub w rodzinie), migrenach świetlnych, ciąży ani pod wpływem alkoholu/substancji. Nie
               używaj przy prowadzeniu pojazdu ani obsłudze maszyn. Częstotliwość ograniczona do {MAX_STROBE_HZ} Hz
               (poniżej najbardziej ryzykownego pasma 15–20 Hz), a sesja działa tylko, gdy przytrzymujesz przycisk lub
@@ -514,7 +515,7 @@ export default function LightJourney() {
                 </div>
 
                 <div className="rounded-xl bg-[var(--color-surface-2)] p-3">
-                  <p className="mb-2 text-sm font-medium">🔦 Lampa błyskowa telefonu (eksperymentalne)</p>
+                  <p className="mb-2 flex items-center gap-1.5 text-sm font-medium"><Flashlight className="h-4 w-4" aria-hidden /> Lampa błyskowa telefonu (eksperymentalne)</p>
                   {torchSupported === null && (
                     <>
                       <p className="mb-2 text-xs text-[var(--color-muted)]">

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Bell } from 'lucide-react';
 import { Button, Card, Pill, ProgressRing, SectionTitle } from '../components/ui';
 import { GuidedPlayer, type GuidedPhase } from '../components/GuidedPlayer';
 import { MEDITATION_TECHNIQUES, type MeditationTechnique } from '../data/meditations';
@@ -99,7 +100,7 @@ function GuidedMeditation() {
   if (done) {
     return (
       <Card className="mx-auto max-w-md text-center">
-        <p className="text-3xl">{technique.icon}</p>
+        <technique.icon className="mx-auto h-8 w-8 text-[var(--color-primary)]" aria-hidden />
         <p className="mt-2 text-lg font-semibold">Medytacja ukończona!</p>
         <p className="mt-1 text-[var(--color-muted)]">Zauważ swój obecny stan umysłu, zanim wrócisz do codziennych zajęć.</p>
         <Button className="mt-5" onClick={() => setDone(false)}>
@@ -119,7 +120,7 @@ function GuidedMeditation() {
           >
             <button className="text-left w-full" onClick={() => setTechniqueId(t.id)}>
               <div className="mb-2 flex items-center gap-2">
-                <span className="text-2xl">{t.icon}</span>
+                <t.icon className="h-6 w-6 text-[var(--color-primary)]" aria-hidden />
                 <h3 className="font-semibold">{t.name}</h3>
               </div>
               <p className="text-sm text-[var(--color-muted)]">{t.description}</p>
@@ -247,7 +248,7 @@ function SilentTimer() {
   if (done) {
     return (
       <Card className="mx-auto max-w-md text-center">
-        <p className="text-3xl">🔔</p>
+        <Bell className="mx-auto h-8 w-8 text-[var(--color-primary)]" aria-hidden />
         <p className="mt-2 text-lg font-semibold">Sesja zakończona!</p>
         <Button className="mt-5" onClick={() => setDone(false)}>
           Wróć do ustawień

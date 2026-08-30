@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Leaf } from 'lucide-react';
 import { Button, Card, SectionTitle } from '../components/ui';
 import { GuidedPlayer, type GuidedPhase } from '../components/GuidedPlayer';
 import { JACOBSON_INTRO, JACOBSON_OUTRO, MUSCLE_GROUPS } from '../data/jacobson';
@@ -104,7 +105,7 @@ export default function Jacobson() {
 
       {done && (
         <Card className="mx-auto max-w-md text-center">
-          <p className="text-3xl">🌿</p>
+          <Leaf className="mx-auto h-8 w-8 text-[var(--color-primary)]" aria-hidden />
           <p className="mt-2 text-lg font-semibold">Sesja ukończona!</p>
           <p className="mt-1 text-[var(--color-muted)]">Zauważ, jak czuje się teraz Twoje ciało w porównaniu do początku.</p>
           <Button className="mt-5" onClick={() => setDone(false)}>

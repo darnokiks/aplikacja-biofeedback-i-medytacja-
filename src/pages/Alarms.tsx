@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { AlertTriangle } from 'lucide-react';
 import { Button, Card, Pill, SectionTitle } from '../components/ui';
 import {
   getAlarms,
@@ -85,8 +86,8 @@ export default function Alarms() {
       />
 
       <Card className="mb-6 border-amber-400/20 bg-amber-400/5">
-        <p className="text-sm text-amber-200">
-          ⚠️ {isNativePlatform() ? (
+        <p className="flex items-start gap-2 text-sm text-amber-200">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden /> {isNativePlatform() ? (
             <>W tej natywnej apce budzik korzysta z prawdziwych powiadomień systemowych — zadzwoni nawet przy zablokowanym ekranie.</>
           ) : (
             <>

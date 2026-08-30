@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Flag } from 'lucide-react';
 import { Button, Card, SectionTitle } from '../../components/ui';
 import { logGameScore, logSession, getBestScore } from '../../lib/storage';
 
@@ -112,7 +113,7 @@ export default function ReactionGame() {
         <Card className="mx-auto max-w-md text-center">
           {isFinalResult ? (
             <>
-              <p className="text-3xl">🏁</p>
+              <Flag className="mx-auto h-8 w-8 text-[var(--color-primary)]" aria-hidden />
               <p className="mt-2 text-lg font-semibold">Wynik: średnio {lastTime} ms</p>
               <p className="mt-1 text-sm text-[var(--color-muted)]">Najlepsza próba: {Math.min(...times)} ms</p>
               <Button className="mt-5" onClick={startGame}>

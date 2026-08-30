@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { AlertTriangle } from 'lucide-react';
 import { Button, Card, Pill, SectionTitle } from '../components/ui';
 import { logSession } from '../lib/storage';
 import { formatMMSS } from '../hooks/useTimer';
@@ -235,8 +236,8 @@ export default function Biofeedback() {
       />
 
       <Card className="mb-6 border-amber-400/20 bg-amber-400/5">
-        <p className="text-sm text-amber-200">
-          ⚠️ To <strong>nie jest urządzenie medyczne</strong>. Pomiar jest orientacyjny i wrażliwy na ruch oraz oświetlenie.
+        <p className="flex items-start gap-2 text-sm text-amber-200">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden /> To <strong>nie jest urządzenie medyczne</strong>. Pomiar jest orientacyjny i wrażliwy na ruch oraz oświetlenie.
           Dla najlepszego sygnału zasłoń obiektyw kamery opuszkiem palca i pozostań nieruchomo, lub usiądź nieruchomo
           przodem do kamery w dobrym, równym świetle.
         </p>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { AlertTriangle, PartyPopper, Sparkles } from 'lucide-react';
 import { Button, Card, Pill, SectionTitle } from '../components/ui';
 import { BreathOrb } from '../components/BreathOrb';
 import { AMBIENT_TRACKS, playBeep, playChime, startAmbientTrack, unlockAudio, type AmbientHandle } from '../lib/audio';
@@ -179,7 +180,7 @@ export default function WimHof() {
 
       <Card className="mb-6 border-amber-400/20 bg-amber-400/5">
         <p className="text-sm text-amber-200">
-          ⚠️ <strong>Nie wykonuj</strong> tej techniki w wodzie, podczas prowadzenia pojazdu ani stojąc. Nie stosuj w ciąży,
+          <AlertTriangle className="mr-1 inline-block h-4 w-4 -translate-y-0.5" aria-hidden /> <strong>Nie wykonuj</strong> tej techniki w wodzie, podczas prowadzenia pojazdu ani stojąc. Nie stosuj w ciąży,
           przy epilepsji, chorobach serca lub nadciśnieniu bez konsultacji z lekarzem. Jeśli poczujesz zawroty głowy —
           przerwij i oddychaj normalnie.
         </p>
@@ -330,7 +331,7 @@ export default function WimHof() {
 
       {phase === 'roundEnd' && (
         <Card className="mx-auto max-w-md text-center">
-          <p className="text-lg font-semibold">Runda {currentRound} ukończona 🎉</p>
+          <p className="flex items-center justify-center gap-2 text-lg font-semibold">Runda {currentRound} ukończona <PartyPopper className="h-5 w-5 text-[var(--color-primary)]" aria-hidden /></p>
           <p className="mt-1 text-[var(--color-muted)]">Czas zatrzymania: {formatMMSS(holdSeconds)}</p>
           <div className="mt-5 flex justify-center gap-3">
             <Button variant="secondary" onClick={stopSession}>
@@ -343,7 +344,7 @@ export default function WimHof() {
 
       {phase === 'done' && (
         <Card className="mx-auto max-w-md text-center">
-          <p className="text-3xl">🌟</p>
+          <Sparkles className="mx-auto h-8 w-8 text-[var(--color-primary)]" aria-hidden />
           <p className="mt-2 text-lg font-semibold">Sesja ukończona!</p>
           <p className="mt-1 text-[var(--color-muted)]">
             Ukończono {rounds} {rounds === 1 ? 'rundę' : 'rundy'}. Najdłuższe zatrzymanie: {formatMMSS(bestHold)}.

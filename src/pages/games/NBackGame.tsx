@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Repeat } from 'lucide-react';
 import { Button, Card, Pill, SectionTitle } from '../../components/ui';
 import { playBeep, playChime, unlockAudio } from '../../lib/audio';
 import { getBestScore, logGameScore, logSession } from '../../lib/storage';
@@ -183,7 +184,7 @@ export default function NBackGame() {
 
       {phase === 'result' && (
         <Card className="mx-auto max-w-md text-center">
-          <p className="text-3xl">🔁</p>
+          <Repeat className="mx-auto h-8 w-8 text-[var(--color-primary)]" aria-hidden />
           <p className="mt-2 text-lg font-semibold">Trafność: {accuracy}%</p>
           <p className="mt-1 text-sm text-[var(--color-muted)]">Poziom: {n}-back</p>
           <Button className="mt-5" onClick={startGame}>

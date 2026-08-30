@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Flame } from 'lucide-react';
 import { Button, Card, SectionTitle } from '../components/ui';
 import { GuidedPlayer, type GuidedPhase } from '../components/GuidedPlayer';
 import { SCHULTZ_FORMULAS, SCHULTZ_INTRO, SCHULTZ_RETURN } from '../data/schultz';
@@ -87,7 +88,7 @@ export default function Schultz() {
 
       {done && (
         <Card className="mx-auto max-w-md text-center">
-          <p className="text-3xl">🕯️</p>
+          <Flame className="mx-auto h-8 w-8 text-[var(--color-primary)]" aria-hidden />
           <p className="mt-2 text-lg font-semibold">Sesja ukończona!</p>
           <p className="mt-1 text-[var(--color-muted)]">Pamiętaj, aby po treningu wstawać powoli.</p>
           <Button className="mt-5" onClick={() => setDone(false)}>

@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
+import { Target, Leaf, Moon, Headphones, type LucideIcon } from 'lucide-react';
 import { Button, Card, Pill, SectionTitle } from '../components/ui';
 import { startFocusSession, unlockAudio, type FocusMode, type FocusSessionHandle } from '../lib/audio';
 import { logSession } from '../lib/storage';
 import { formatMMSS } from '../hooks/useTimer';
 
-const MODES: { id: FocusMode; name: string; icon: string; description: string }[] = [
-  { id: 'focus', name: 'Focus', icon: '🎯', description: 'Fale beta (16 Hz) — koncentracja przy nauce i pracy.' },
-  { id: 'relax', name: 'Relaks', icon: '🌿', description: 'Fale alfa (9 Hz) — wyciszenie i redukcja stresu.' },
-  { id: 'sleep', name: 'Sen', icon: '🌙', description: 'Fale delta (3 Hz) — głęboki relaks przed snem.' },
+const MODES: { id: FocusMode; name: string; icon: LucideIcon; description: string }[] = [
+  { id: 'focus', name: 'Focus', icon: Target, description: 'Fale beta (16 Hz) — koncentracja przy nauce i pracy.' },
+  { id: 'relax', name: 'Relaks', icon: Leaf, description: 'Fale alfa (9 Hz) — wyciszenie i redukcja stresu.' },
+  { id: 'sleep', name: 'Sen', icon: Moon, description: 'Fale delta (3 Hz) — głęboki relaks przed snem.' },
 ];
 
 export default function Focus() {
@@ -83,8 +84,8 @@ export default function Focus() {
       />
 
       <Card className="mb-6 border-sky-400/20 bg-sky-400/5">
-        <p className="text-sm text-sky-200">
-          🎧 Efekt fal binauralnych wymaga słuchawek — każde ucho odbiera nieco inną częstotliwość, a mózg
+        <p className="flex items-start gap-2 text-sm text-sky-200">
+          <Headphones className="mt-0.5 h-4 w-4 shrink-0" aria-hidden /> Efekt fal binauralnych wymaga słuchawek — każde ucho odbiera nieco inną częstotliwość, a mózg
           &bdquo;słyszy&rdquo; różnicę między nimi. Nie stosuj przy epilepsji reagującej na dźwięki rytmiczne.
         </p>
       </Card>
@@ -99,7 +100,7 @@ export default function Focus() {
               >
                 <button className="w-full text-left" onClick={() => setMode(m.id)}>
                   <div className="mb-2 flex items-center gap-2">
-                    <span className="text-2xl">{m.icon}</span>
+                    <m.icon className="h-6 w-6 text-[var(--color-primary)]" aria-hidden />
                     <h3 className="font-semibold">{m.name}</h3>
                   </div>
                   <p className="text-sm text-[var(--color-muted)]">{m.description}</p>

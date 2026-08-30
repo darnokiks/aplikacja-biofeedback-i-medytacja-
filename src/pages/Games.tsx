@@ -1,11 +1,20 @@
 import { Link } from 'react-router-dom';
+import { Zap, Puzzle, Repeat, type LucideIcon } from 'lucide-react';
 import { Card, Pill, SectionTitle } from '../components/ui';
 import { getBestScore } from '../lib/storage';
 
-const GAMES = [
+const GAMES: {
+  to: string;
+  icon: LucideIcon;
+  name: string;
+  description: string;
+  scoreKey: string;
+  scoreLabel: (v: number) => string;
+  lowerIsBetter: boolean;
+}[] = [
   {
     to: '/gry/reakcja',
-    icon: '⚡',
+    icon: Zap,
     name: 'Czas reakcji',
     description: 'Kliknij, gdy tylko ekran zmieni kolor na zielony. Mierzymy Twój czas reakcji w milisekundach.',
     scoreKey: 'reaction',
@@ -14,7 +23,7 @@ const GAMES = [
   },
   {
     to: '/gry/pamiec',
-    icon: '🧩',
+    icon: Puzzle,
     name: 'Sekwencje pamięciowe',
     description: 'Zapamiętaj i powtórz coraz dłuższą sekwencję podświetlanych pól — trening pamięci roboczej.',
     scoreKey: 'memory',
@@ -23,7 +32,7 @@ const GAMES = [
   },
   {
     to: '/gry/nback',
-    icon: '🔁',
+    icon: Repeat,
     name: 'N-Back',
     description: 'Klasyczny trening pamięci roboczej — wskaż, gdy obecna pozycja powtarza się sprzed N kroków.',
     scoreKey: 'nback',
@@ -47,7 +56,7 @@ export default function Games() {
             <Link key={g.to} to={g.to} className="group">
               <Card className="h-full transition group-hover:border-[var(--color-primary)]/40 group-hover:-translate-y-0.5">
                 <div className="mb-3 flex items-center justify-between">
-                  <span className="text-3xl">{g.icon}</span>
+                  <g.icon className="h-7 w-7 text-[var(--color-primary)]" aria-hidden />
                   {best !== null && <Pill tone="accent">{g.scoreLabel(best)}</Pill>}
                 </div>
                 <h3 className="text-lg font-semibold">{g.name}</h3>

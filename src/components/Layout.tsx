@@ -1,24 +1,26 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { MoreHorizontal } from 'lucide-react';
 import { Logo } from './Logo';
+import { ROUTE_ICONS } from '../lib/icons';
 
 const PRIMARY_NAV = [
-  { to: '/', label: 'Start', icon: '🏠', end: true },
-  { to: '/budzik', label: 'Budzik', icon: '⏰' },
-  { to: '/oddech', label: 'Oddech', icon: '🌬️' },
-  { to: '/medytacja', label: 'Medytacja', icon: '🧘' },
-  { to: '/focus', label: 'Focus/Sen', icon: '🎧' },
-  { to: '/gry', label: 'Trening mózgu', icon: '🧠' },
-  { to: '/postepy', label: 'Postępy', icon: '📈' },
+  { to: '/', label: 'Start', end: true },
+  { to: '/budzik', label: 'Budzik' },
+  { to: '/oddech', label: 'Oddech' },
+  { to: '/medytacja', label: 'Medytacja' },
+  { to: '/focus', label: 'Focus/Sen' },
+  { to: '/gry', label: 'Trening mózgu' },
+  { to: '/postepy', label: 'Postępy' },
 ] as const;
 
 const MORE_NAV = [
-  { to: '/jacobson', label: 'Jacobson', icon: '🧎' },
-  { to: '/schultz', label: 'Schultz', icon: '🕯️' },
-  { to: '/swiatlo', label: 'Podróż światła', icon: '✨' },
-  { to: '/muzyka', label: 'Muzyka', icon: '🎵' },
-  { to: '/biofeedback', label: 'Biofeedback', icon: '❤️' },
-  { to: '/urzadzenia', label: 'Urządzenia', icon: '🔧' },
+  { to: '/jacobson', label: 'Jacobson' },
+  { to: '/schultz', label: 'Schultz' },
+  { to: '/swiatlo', label: 'Podróż światła' },
+  { to: '/muzyka', label: 'Muzyka' },
+  { to: '/biofeedback', label: 'Biofeedback' },
+  { to: '/urzadzenia', label: 'Urządzenia' },
 ] as const;
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -60,26 +62,29 @@ function MoreMenu() {
             : 'text-[var(--color-muted)] hover:bg-white/5 hover:text-[var(--color-text)]'
         }`}
       >
-        <span aria-hidden>⋯</span>
+        <MoreHorizontal className="h-[18px] w-[18px]" aria-hidden />
         <span className="hidden sm:inline">Więcej</span>
       </button>
       {open && (
         <div className="absolute right-0 top-full z-40 mt-2 w-56 overflow-hidden rounded-xl border border-white/10 bg-[var(--color-surface)] py-1.5 shadow-xl shadow-black/40">
-          {MORE_NAV.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              onClick={() => setOpen(false)}
-              className={({ isActive }) =>
-                `flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-medium transition ${
-                  isActive ? 'bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'text-[var(--color-text)] hover:bg-white/5'
-                }`
-              }
-            >
-              <span aria-hidden>{item.icon}</span>
-              {item.label}
-            </NavLink>
-          ))}
+          {MORE_NAV.map((item) => {
+            const Icon = ROUTE_ICONS[item.to];
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                onClick={() => setOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-medium transition ${
+                    isActive ? 'bg-[var(--color-primary)]/10 text-[var(--color-primary)]' : 'text-[var(--color-text)] hover:bg-white/5'
+                  }`
+                }
+              >
+                <Icon className="h-[18px] w-[18px]" aria-hidden />
+                {item.label}
+              </NavLink>
+            );
+          })}
         </div>
       )}
     </div>
@@ -96,12 +101,15 @@ export function Layout({ children }: { children: ReactNode }) {
           </NavLink>
           <div className="flex min-w-0 items-center gap-1">
             <nav className="scrollbar-thin -mx-2 flex min-w-0 items-center gap-1 overflow-x-auto px-2">
-              {PRIMARY_NAV.map((item) => (
-                <NavLink key={item.to} to={item.to} end={'end' in item ? item.end : false} className={navLinkClass}>
-                  <span aria-hidden>{item.icon}</span>
-                  <span className="hidden sm:inline">{item.label}</span>
-                </NavLink>
-              ))}
+              {PRIMARY_NAV.map((item) => {
+                const Icon = ROUTE_ICONS[item.to];
+                return (
+                  <NavLink key={item.to} to={item.to} end={'end' in item ? item.end : false} className={navLinkClass}>
+                    <Icon className="h-[18px] w-[18px]" aria-hidden />
+                    <span className="hidden sm:inline">{item.label}</span>
+                  </NavLink>
+                );
+              })}
             </nav>
             <MoreMenu />
           </div>

@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom';
+import { Flame } from 'lucide-react';
 import { Card, Pill, SectionTitle } from '../components/ui';
 import { LogoMark } from '../components/Logo';
+import { ROUTE_ICONS } from '../lib/icons';
 import { getStreak, getTotalMinutes, getSessions } from '../lib/storage';
 
 interface ModuleDef {
   to: string;
-  icon: string;
   title: string;
   description: string;
   tag: string;
@@ -17,7 +18,6 @@ const CATEGORIES: { name: string; modules: ModuleDef[] }[] = [
     modules: [
       {
         to: '/budzik',
-        icon: '⏰',
         title: 'Budzik i przypomnienia',
         description: 'Zaplanuj poranne wstawanie z automatycznym startem oddechu, albo ustaw przypomnienie o zadaniu.',
         tag: 'Rutyna',
@@ -29,21 +29,18 @@ const CATEGORIES: { name: string; modules: ModuleDef[] }[] = [
     modules: [
       {
         to: '/oddech',
-        icon: '🌬️',
         title: 'Oddech Wima Hofa',
         description: 'Rundy głębokich oddechów, zatrzymanie i oddech odzyskujący — zwiększ energię i odporność na stres.',
         tag: 'Oddech',
       },
       {
         to: '/jacobson',
-        icon: '🧎',
         title: 'Trening Jacobsona',
         description: 'Progresywna relaksacja mięśni — naprzemienne napinanie i rozluźnianie grup mięśniowych z narracją głosową.',
         tag: 'Relaksacja',
       },
       {
         to: '/schultz',
-        icon: '🕯️',
         title: 'Trening autogenny Schultza',
         description: 'Sześć klasycznych formuł: ciężar, ciepło, serce, oddech, brzuch, chłodne czoło.',
         tag: 'Relaksacja',
@@ -55,28 +52,24 @@ const CATEGORIES: { name: string; modules: ModuleDef[] }[] = [
     modules: [
       {
         to: '/medytacja',
-        icon: '🧘',
         title: 'Techniki medytacji',
         description: 'Uważność, skan ciała, liczenie oddechów i życzliwość — z timerem i dzwonkiem interwałowym.',
         tag: 'Medytacja',
       },
       {
         to: '/muzyka',
-        icon: '🎵',
         title: 'Biblioteka muzyki',
         description: 'Sześć generatywnych utworów ambientowych na relaks, sen, skupienie i energię.',
         tag: 'Dźwięk',
       },
       {
         to: '/focus',
-        icon: '🎧',
         title: 'Dźwięki koncentracji',
         description: 'Fale binauralne i szum tła do trybów Focus / Relaks / Sen — jak w brain.fm, generowane na żywo.',
         tag: 'Dźwięk',
       },
       {
         to: '/swiatlo',
-        icon: '✨',
         title: 'Podróż światła',
         description: 'Łagodnie pulsujące światło w rytmie oddechu, inspirowane light journey — plus tryb stroboskopu z zabezpieczeniami.',
         tag: 'Światło',
@@ -88,7 +81,6 @@ const CATEGORIES: { name: string; modules: ModuleDef[] }[] = [
     modules: [
       {
         to: '/gry',
-        icon: '🧠',
         title: 'Trening mózgu',
         description: 'Gry poznawcze w stylu Lumosity: czas reakcji, pamięć i n-back — trenuj koncentrację i pamięć roboczą.',
         tag: 'Kognitywistyka',
@@ -100,14 +92,12 @@ const CATEGORIES: { name: string; modules: ModuleDef[] }[] = [
     modules: [
       {
         to: '/biofeedback',
-        icon: '❤️',
         title: 'Biofeedback',
         description: 'Pomiar tętna z kamery i oddech synchronizowany z rytmem serca — poznaj swój stan fizjologiczny.',
         tag: 'Biofeedback',
       },
       {
         to: '/urzadzenia',
-        icon: '🔧',
         title: 'Urządzenia',
         description: 'Sparuj czujnik tętna (np. Polar) lub headset EEG (Muse, OpenBCI Ganglion) przez Bluetooth.',
         tag: 'Sprzęt',
@@ -119,7 +109,6 @@ const CATEGORIES: { name: string; modules: ModuleDef[] }[] = [
     modules: [
       {
         to: '/postepy',
-        icon: '📈',
         title: 'Postępy',
         description: 'Historia sesji, passa dni i statystyki wszystkich modułów w jednym miejscu.',
         tag: 'Statystyki',
@@ -129,12 +118,13 @@ const CATEGORIES: { name: string; modules: ModuleDef[] }[] = [
 ];
 
 function ModuleCard({ m }: { m: ModuleDef }) {
+  const Icon = ROUTE_ICONS[m.to];
   return (
     <Link to={m.to} className="group">
       <Card className="h-full transition group-hover:border-[var(--color-primary)]/40 group-hover:-translate-y-0.5">
         <div className="mb-3 flex items-center justify-between">
-          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-[var(--color-primary)]/20 to-[var(--color-accent)]/20 text-xl">
-            {m.icon}
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-[var(--color-primary)]/20 to-[var(--color-accent)]/20">
+            <Icon className="h-5 w-5 text-[var(--color-primary)]" aria-hidden />
           </span>
           <Pill tone="muted">{m.tag}</Pill>
         </div>
@@ -168,7 +158,9 @@ export default function Home() {
       <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Card>
           <p className="text-sm text-[var(--color-muted)]">Passa dni</p>
-          <p className="mt-1 text-3xl font-bold text-[var(--color-primary)]">{streak} 🔥</p>
+          <p className="mt-1 flex items-center gap-1.5 text-3xl font-bold text-[var(--color-primary)]">
+            {streak} <Flame className="h-6 w-6" aria-hidden />
+          </p>
         </Card>
         <Card>
           <p className="text-sm text-[var(--color-muted)]">Łączny czas praktyki</p>

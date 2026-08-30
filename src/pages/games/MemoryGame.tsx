@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Puzzle } from 'lucide-react';
 import { Button, Card, Pill, SectionTitle } from '../../components/ui';
 import { playBeep, playChime, unlockAudio } from '../../lib/audio';
 import { getBestScore, logGameScore, logSession } from '../../lib/storage';
@@ -134,7 +135,7 @@ export default function MemoryGame() {
 
         {phase === 'gameover' && (
           <Card className="max-w-md text-center">
-            <p className="text-3xl">🧩</p>
+            <Puzzle className="mx-auto h-8 w-8 text-[var(--color-primary)]" aria-hidden />
             <p className="mt-2 text-lg font-semibold">Koniec gry! Wynik: {sequence.length - 1} pól</p>
             <Button className="mt-4" onClick={startGame}>
               Zagraj ponownie

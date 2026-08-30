@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Ban, HeartPulse, Brain, Cpu } from 'lucide-react';
 import { Button, Card, Pill, SectionTitle } from '../components/ui';
 import { isWebBluetoothSupported } from '../lib/devices/webBluetooth';
 import { connectHeartRateSensor, type HeartRateSensorHandle } from '../lib/devices/heartRate';
@@ -18,8 +19,8 @@ export default function Devices() {
 
       {!supported && (
         <Card className="mb-6 border-rose-400/25 bg-rose-400/5">
-          <p className="text-sm text-rose-200">
-            🚫 Ta przeglądarka nie obsługuje Web Bluetooth. Działa w Chrome/Edge na komputerze i Androidzie.{' '}
+          <p className="flex items-start gap-2 text-sm text-rose-200">
+            <Ban className="mt-0.5 h-4 w-4 shrink-0" aria-hidden /> Ta przeglądarka nie obsługuje Web Bluetooth. Działa w Chrome/Edge na komputerze i Androidzie.{' '}
             <strong>Nie działa w Safari na iPhonie</strong> ani w Firefoksie — to ograniczenie tych przeglądarek, nie
             tej aplikacji.
           </p>
@@ -85,7 +86,7 @@ function HeartRateCard({ disabled }: { disabled: boolean }) {
   return (
     <Card>
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="font-semibold">❤️ Czujnik tętna (HRV)</h3>
+        <h3 className="flex items-center gap-2 font-semibold"><HeartPulse className="h-5 w-5 text-[var(--color-primary)]" aria-hidden /> Czujnik tętna (HRV)</h3>
         {status === 'connected' && <Pill tone="accent">Połączono</Pill>}
       </div>
       <p className="mb-4 text-sm text-[var(--color-muted)]">
@@ -155,7 +156,7 @@ function MuseCard({ disabled }: { disabled: boolean }) {
   return (
     <Card>
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="font-semibold">🧠 Muse (EEG)</h3>
+        <h3 className="flex items-center gap-2 font-semibold"><Brain className="h-5 w-5 text-[var(--color-primary)]" aria-hidden /> Muse (EEG)</h3>
         {status === 'connected' && <Pill tone="accent">Połączono</Pill>}
       </div>
       <p className="mb-4 text-sm text-[var(--color-muted)]">
@@ -238,7 +239,7 @@ function GanglionCard({ disabled }: { disabled: boolean }) {
   return (
     <Card>
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="font-semibold">🔧 OpenBCI Ganglion (EEG)</h3>
+        <h3 className="flex items-center gap-2 font-semibold"><Cpu className="h-5 w-5 text-[var(--color-primary)]" aria-hidden /> OpenBCI Ganglion (EEG)</h3>
         {status === 'connected' && <Pill tone="accent">Połączono</Pill>}
       </div>
       <p className="mb-4 text-sm text-[var(--color-muted)]">

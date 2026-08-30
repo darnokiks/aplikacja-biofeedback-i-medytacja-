@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AlarmClock, Bell } from 'lucide-react';
 import { Button } from './ui';
 import { startAlarmTone, playBeep, unlockAudio, type AlarmToneHandle } from '../lib/audio';
 import {
@@ -162,7 +163,7 @@ export function AlarmEngine() {
     <>
       {firingAlarm && (
         <div className="fixed inset-0 z-[70] flex flex-col items-center justify-center gap-6 bg-[#0b1120]/98 px-6 text-center backdrop-blur">
-          <p className="text-6xl">⏰</p>
+          <AlarmClock className="h-16 w-16 text-[var(--color-primary)]" aria-hidden />
           <div>
             <p className="text-4xl font-bold tabular-nums">{hhmmNow(new Date())}</p>
             <p className="mt-2 text-lg text-[var(--color-muted)]">{firingAlarm.label || 'Budzik'}</p>
@@ -181,7 +182,7 @@ export function AlarmEngine() {
 
       {firingReminder && (
         <div className="fixed bottom-6 left-1/2 z-[70] w-[92%] max-w-md -translate-x-1/2 rounded-2xl border border-white/10 bg-[var(--color-surface)] p-4 shadow-2xl shadow-black/50">
-          <p className="font-semibold">🔔 {firingReminder.title}</p>
+          <p className="flex items-center gap-2 font-semibold"><Bell className="h-4 w-4 text-[var(--color-primary)]" aria-hidden /> {firingReminder.title}</p>
           {firingReminder.notes && <p className="mt-1 text-sm text-[var(--color-muted)]">{firingReminder.notes}</p>}
           <Button variant="secondary" className="mt-3 w-full" onClick={() => setFiringReminder(null)}>
             OK

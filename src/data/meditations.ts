@@ -1,7 +1,9 @@
+import { Waves, Scan, ListOrdered, Heart, type LucideIcon } from 'lucide-react';
+
 export interface MeditationTechnique {
   id: string;
   name: string;
-  icon: string;
+  icon: LucideIcon;
   description: string;
   intro: string;
   script: string[];
@@ -12,7 +14,7 @@ export const MEDITATION_TECHNIQUES: MeditationTechnique[] = [
   {
     id: 'mindfulness',
     name: 'Uważność oddechu',
-    icon: '🌊',
+    icon: Waves,
     description: 'Obserwuj naturalny oddech, łagodnie wracając uwagą, gdy umysł zaczyna błądzić.',
     intro: 'Usiądź wygodnie z wyprostowanymi plecami. Zamknij oczy lub skieruj wzrok łagodnie w dół.',
     script: [
@@ -27,7 +29,7 @@ export const MEDITATION_TECHNIQUES: MeditationTechnique[] = [
   {
     id: 'bodyscan',
     name: 'Skan ciała',
-    icon: '🩶',
+    icon: Scan,
     description: 'Przenoś uwagę kolejno przez części ciała, zauważając odczucia bez ich zmieniania.',
     intro: 'Połóż się lub usiądź wygodnie. Zamknij oczy i weź kilka spokojnych oddechów.',
     script: [
@@ -42,7 +44,7 @@ export const MEDITATION_TECHNIQUES: MeditationTechnique[] = [
   {
     id: 'counting',
     name: 'Liczenie oddechów',
-    icon: '🔢',
+    icon: ListOrdered,
     description: 'Prosta technika koncentracji — licz kolejne oddechy od jednego do dziesięciu.',
     intro: 'Usiądź wygodnie. Będziemy liczyć oddechy, aby zakotwiczyć uwagę w chwili obecnej.',
     script: [
@@ -57,7 +59,7 @@ export const MEDITATION_TECHNIQUES: MeditationTechnique[] = [
   {
     id: 'metta',
     name: 'Życzliwość (metta)',
-    icon: '💗',
+    icon: Heart,
     description: 'Kieruj ciepłe, życzliwe intencje do siebie, bliskich i wszystkich istot.',
     intro: 'Usiądź wygodnie, połóż dłoń na sercu, jeśli to pomaga poczuć ciepło i troskę.',
     script: [
