@@ -8,7 +8,8 @@ i bezpieczne: brakujący lub uszkodzony plik zawsze cicho wraca do wersji syntet
 ```
 public/audio/
 ├── narration/   ← nagrania głosowe (medytacje prowadzone, instrukcje)
-└── music/       ← muzyka (pliki .mp3 dla biblioteki ambientowej)
+├── music/       ← muzyka (pliki .mp3 dla biblioteki ambientowej)
+└── lectures/    ← wykłady audio "po co dana metoda" (patrz sekcja niżej)
 ```
 
 ## Jak dodać nagranie głosowe
@@ -95,6 +96,26 @@ Znormalizuj głośność między plikami, żeby przejścia między frazami nie "
 Nowy utwór, którego nie ma jeszcze w `AMBIENT_TRACKS`, wymaga dopisania go tam jako osobnego
 wpisu (z `id`, `name`, `mood`, opisem i parametrami syntezy — te ostatnie są używane tylko,
 gdy nagranie akurat nie jest dostępne, więc mogą być przybliżone).
+
+## Jak dodać wykład audio ("po co dana metoda")
+
+Każdy moduł ma sekcję „Po co ta metoda?" (komponent `src/components/EducationPanel.tsx`) z
+zakładką „Wykład audio". Dziś zawsze pokazuje informację, że nagrania brak — żeby to podmienić:
+
+1. Nagraj lub zleć krótki wykład/komentarz o metodzie (czym jest, skąd się wzięła, po co jej
+   używać — gotowy tekst wyjściowy do przeczytania jest już w `src/data/education.ts`, można go
+   użyć jako scenariusza).
+2. Zapisz jako `public/audio/lectures/<id>.mp3`, gdzie `<id>` to jeden z: `wimhof`, `jacobson`,
+   `schultz`, `meditation`, `focus`, `light`, `biofeedback`.
+3. Dopisz wpis do `LECTURE_AUDIO_MANIFEST` w `src/lib/education.ts`:
+   ```ts
+   const LECTURE_AUDIO_MANIFEST: Record<string, string> = {
+     wimhof: '/audio/lectures/wimhof.mp3',
+   };
+   ```
+4. Gotowe — zakładka „Wykład audio" pokaże odtwarzacz zamiast informacji o braku nagrania.
+
+Wideo instruktażowe działają identycznie, patrz `public/video/README.md`.
 
 ## Licencja i pochodzenie plików
 

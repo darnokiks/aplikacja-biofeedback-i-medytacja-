@@ -20,9 +20,12 @@ export default function Devices() {
       {!supported && (
         <Card className="mb-6 border-rose-400/25 bg-rose-400/5">
           <p className="flex items-start gap-2 text-sm text-rose-200">
-            <Ban className="mt-0.5 h-4 w-4 shrink-0" aria-hidden /> Ta przeglądarka nie obsługuje Web Bluetooth. Działa w Chrome/Edge na komputerze i Androidzie.{' '}
-            <strong>Nie działa w Safari na iPhonie</strong> ani w Firefoksie — to ograniczenie tych przeglądarek, nie
-            tej aplikacji.
+            <Ban className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+            <span>
+              Ta przeglądarka nie obsługuje Web Bluetooth. Działa w Chrome/Edge na komputerze i Androidzie.{' '}
+              <strong>Nie działa w Safari na iPhonie</strong> ani w Firefoksie — to ograniczenie tych przeglądarek, nie
+              tej aplikacji.
+            </span>
           </p>
         </Card>
       )}

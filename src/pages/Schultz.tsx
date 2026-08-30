@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Flame } from 'lucide-react';
 import { Button, Card, SectionTitle } from '../components/ui';
 import { GuidedPlayer, type GuidedPhase } from '../components/GuidedPlayer';
+import { EducationPanel } from '../components/EducationPanel';
 import { SCHULTZ_FORMULAS, SCHULTZ_INTRO, SCHULTZ_RETURN } from '../data/schultz';
 import { logSession } from '../lib/storage';
 import { unlockAudio } from '../lib/audio';
@@ -47,6 +48,8 @@ export default function Schultz() {
         title="Metoda Schultza"
         description="Klasyczne formuły autosugestii: ciężar, ciepło, serce, oddech, splot słoneczny i chłodne czoło. Zawsze kończ sesję fazą powrotu do czujności."
       />
+
+      <EducationPanel moduleId="schultz" />
 
       {!running && !done && (
         <Card className="mx-auto max-w-xl">

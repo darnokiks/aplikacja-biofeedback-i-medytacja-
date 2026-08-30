@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Ban, Flashlight, Sparkles } from 'lucide-react';
 import { Button, Card, Pill, SectionTitle } from '../components/ui';
+import { EducationPanel } from '../components/EducationPanel';
 import { AMBIENT_TRACKS, startAmbientTrack, unlockAudio, type AmbientHandle } from '../lib/audio';
 import { logSession } from '../lib/storage';
 import { formatMMSS } from '../hooks/useTimer';
@@ -334,6 +335,8 @@ export default function LightJourney() {
         description="Pulsujące światło w rytmie oddechu (łagodne) lub prawdziwy stroboskop z zabezpieczeniami, inspirowane doświadczeniami typu light journey (np. Lumenate)."
       />
 
+      <EducationPanel moduleId="light" />
+
       <div className="mb-6 inline-flex rounded-xl bg-[var(--color-surface-2)] p-1">
         <button
           onClick={() => setMode('gentle')}
@@ -353,9 +356,15 @@ export default function LightJourney() {
         <>
           <Card className="mb-6 border-rose-400/25 bg-rose-400/5">
             <p className="flex items-start gap-2 text-sm text-rose-200">
-              <Ban className="mt-0.5 h-4 w-4 shrink-0" aria-hidden /> <strong>Nie używaj, jeśli masz padaczkę światłoczułą, migreny wywoływane światłem lub inne schorzenia
-              neurologiczne wrażliwe na bodźce wizualne.</strong> Światło pulsuje bardzo wolno (pełny cykl trwa {cycleSec}s).
-              Jeśli poczujesz zawroty głowy, mdłości lub dyskomfort — natychmiast zakończ sesję.
+              <Ban className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+              <span>
+                <strong>
+                  Nie używaj, jeśli masz padaczkę światłoczułą, migreny wywoływane światłem lub inne schorzenia
+                  neurologiczne wrażliwe na bodźce wizualne.
+                </strong>{' '}
+                Światło pulsuje bardzo wolno (pełny cykl trwa {cycleSec}s). Jeśli poczujesz zawroty głowy, mdłości lub
+                dyskomfort — natychmiast zakończ sesję.
+              </span>
             </p>
           </Card>
 
@@ -434,11 +443,14 @@ export default function LightJourney() {
         <>
           <Card className="mb-6 border-rose-400/30 bg-rose-500/10">
             <p className="flex items-start gap-2 text-sm text-rose-200">
-              <Ban className="mt-0.5 h-4 w-4 shrink-0" aria-hidden /> <strong>Prawdziwe miganie światła — realne ryzyko napadu padaczki światłoczułej.</strong> Nie używaj przy
-              padaczce (własnej lub w rodzinie), migrenach świetlnych, ciąży ani pod wpływem alkoholu/substancji. Nie
-              używaj przy prowadzeniu pojazdu ani obsłudze maszyn. Częstotliwość ograniczona do {MAX_STROBE_HZ} Hz
-              (poniżej najbardziej ryzykownego pasma 15–20 Hz), a sesja działa tylko, gdy przytrzymujesz przycisk lub
-              spację — puszczenie natychmiast zatrzymuje miganie.
+              <Ban className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+              <span>
+                <strong>Prawdziwe miganie światła — realne ryzyko napadu padaczki światłoczułej.</strong> Nie używaj
+                przy padaczce (własnej lub w rodzinie), migrenach świetlnych, ciąży ani pod wpływem
+                alkoholu/substancji. Nie używaj przy prowadzeniu pojazdu ani obsłudze maszyn. Częstotliwość
+                ograniczona do {MAX_STROBE_HZ} Hz (poniżej najbardziej ryzykownego pasma 15–20 Hz), a sesja działa
+                tylko, gdy przytrzymujesz przycisk lub spację — puszczenie natychmiast zatrzymuje miganie.
+              </span>
             </p>
           </Card>
 

@@ -101,9 +101,11 @@ export default function Login() {
 
         <p className="flex items-start gap-2 pt-1 text-xs text-[var(--color-muted)]">
           <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-          Przyciski oznaczone „wymaga konfiguracji” potrzebują własnego klucza dostawcy (Client
-          ID/App ID) wklejonego w <code className="text-[var(--color-text)]">src/lib/auth.ts</code>{' '}
-          — instrukcje w README.
+          <span>
+            Przyciski oznaczone „wymaga konfiguracji” potrzebują własnego klucza dostawcy (Client
+            ID/App ID) wklejonego w <code className="text-[var(--color-text)]">src/lib/auth.ts</code> — instrukcje w
+            README.
+          </span>
         </p>
       </Card>
     </div>

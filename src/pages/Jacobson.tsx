@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Leaf } from 'lucide-react';
 import { Button, Card, SectionTitle } from '../components/ui';
 import { GuidedPlayer, type GuidedPhase } from '../components/GuidedPlayer';
+import { EducationPanel } from '../components/EducationPanel';
 import { JACOBSON_INTRO, JACOBSON_OUTRO, MUSCLE_GROUPS } from '../data/jacobson';
 import { logSession } from '../lib/storage';
 import { unlockAudio } from '../lib/audio';
@@ -65,6 +66,8 @@ export default function Jacobson() {
         title="Trening Jacobsona"
         description="Naprzemienne napinanie i rozluźnianie kolejnych grup mięśniowych. Ucz ciało rozpoznawać i uwalniać napięcie."
       />
+
+      <EducationPanel moduleId="jacobson" />
 
       {!running && !done && (
         <Card className="mx-auto max-w-xl">

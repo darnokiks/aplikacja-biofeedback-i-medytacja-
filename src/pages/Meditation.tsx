@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Bell } from 'lucide-react';
 import { Button, Card, Pill, ProgressRing, SectionTitle } from '../components/ui';
 import { GuidedPlayer, type GuidedPhase } from '../components/GuidedPlayer';
+import { EducationPanel } from '../components/EducationPanel';
 import { MEDITATION_TECHNIQUES, type MeditationTechnique } from '../data/meditations';
 import { logSession } from '../lib/storage';
 import { playBell, playChime, unlockAudio } from '../lib/audio';
@@ -36,6 +37,8 @@ export default function Meditation() {
         title="Techniki medytacji"
         description="Wybierz prowadzoną medytację z narracją lub ciszę z dzwonkiem interwałowym."
       />
+
+      <EducationPanel moduleId="meditation" />
 
       <div className="mb-6 inline-flex rounded-xl bg-[var(--color-surface-2)] p-1">
         <button

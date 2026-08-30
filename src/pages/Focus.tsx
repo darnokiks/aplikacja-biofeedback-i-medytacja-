@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Target, Leaf, Moon, Headphones, type LucideIcon } from 'lucide-react';
 import { Button, Card, Pill, SectionTitle } from '../components/ui';
+import { EducationPanel } from '../components/EducationPanel';
 import { startFocusSession, unlockAudio, type FocusMode, type FocusSessionHandle } from '../lib/audio';
 import { logSession } from '../lib/storage';
 import { formatMMSS } from '../hooks/useTimer';
@@ -83,10 +84,15 @@ export default function Focus() {
         description="Fale binauralne generowane na żywo w przeglądarce, wspierające koncentrację, relaks lub zasypianie. Używaj słuchawek, aby usłyszeć efekt binauralny."
       />
 
+      <EducationPanel moduleId="focus" />
+
       <Card className="mb-6 border-sky-400/20 bg-sky-400/5">
         <p className="flex items-start gap-2 text-sm text-sky-200">
-          <Headphones className="mt-0.5 h-4 w-4 shrink-0" aria-hidden /> Efekt fal binauralnych wymaga słuchawek — każde ucho odbiera nieco inną częstotliwość, a mózg
-          &bdquo;słyszy&rdquo; różnicę między nimi. Nie stosuj przy epilepsji reagującej na dźwięki rytmiczne.
+          <Headphones className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+          <span>
+            Efekt fal binauralnych wymaga słuchawek — każde ucho odbiera nieco inną częstotliwość, a mózg
+            &bdquo;słyszy&rdquo; różnicę między nimi. Nie stosuj przy epilepsji reagującej na dźwięki rytmiczne.
+          </span>
         </p>
       </Card>
 

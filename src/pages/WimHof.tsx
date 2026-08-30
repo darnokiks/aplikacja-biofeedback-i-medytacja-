@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { AlertTriangle, PartyPopper, Sparkles } from 'lucide-react';
 import { Button, Card, Pill, SectionTitle } from '../components/ui';
 import { BreathOrb } from '../components/BreathOrb';
+import { EducationPanel } from '../components/EducationPanel';
 import { AMBIENT_TRACKS, playBeep, playChime, startAmbientTrack, unlockAudio, type AmbientHandle } from '../lib/audio';
 import { speakNarration } from '../lib/narration';
 import { logSession } from '../lib/storage';
@@ -177,6 +178,8 @@ export default function WimHof() {
         title="Metoda Wima Hofa"
         description="Kontrolowana hiperwentylacja, zatrzymanie oddechu i oddech odzyskujący. Praktykuj w bezpiecznym miejscu, w pozycji siedzącej lub leżącej."
       />
+
+      <EducationPanel moduleId="wimhof" />
 
       <Card className="mb-6 border-amber-400/20 bg-amber-400/5">
         <p className="text-sm text-amber-200">

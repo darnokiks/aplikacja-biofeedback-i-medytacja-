@@ -66,6 +66,19 @@ Biblioteka muzyki ambientowej działa analogicznie: `startAmbientTrack()` w `src
 generuje utwór w 100% syntetycznie. Oba manifesty są dziś puste — folder `public/audio/` to gotowe miejsce na
 przyszłe nagrania i muzykę, z pełną listą oczekiwanych nazw plików w `public/audio/README.md`.
 
+## Treści edukacyjne ("po co dana metoda")
+
+Każdy moduł (Wim Hof, Jacobson, Schultz, medytacja, Focus, Podróż światła, Biofeedback) ma teraz rozwijaną sekcję
+„Po co ta metoda?" (`src/components/EducationPanel.tsx`, treści w `src/data/education.ts`) wyjaśniającą, czym jest
+dana technika, skąd się wzięła i jakie są jej potencjalne korzyści — z odpowiednio ostrożnymi zastrzeżeniami tam,
+gdzie dowody naukowe są ograniczone. Sekcja ma trzy zakładki:
+
+- **Tekst** — gotowy od razu, napisany wprost w kodzie.
+- **Wideo** i **Wykład audio** — miejsca na prawdziwe nagrania (`public/video/education/<id>.mp4` i
+  `public/audio/lectures/<id>.mp3`), dziś puste; instrukcja dodania własnych plików jest w
+  `public/video/README.md` i w sekcji „Jak dodać wykład audio" w `public/audio/README.md`. Bez tych plików
+  zakładki po prostu pokazują informację, że nagrania jeszcze brak — reszta aplikacji działa bez zmian.
+
 ## Logowanie (Google / Facebook / X)
 
 Strona `/logowanie` (i przycisk konta w nagłówku) obsługuje logowanie przez trzech dostawców, w całości po stronie
