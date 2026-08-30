@@ -1,4 +1,4 @@
-# Spokój — medytacja, oddech i biofeedback
+# Mental Wellness — medytacja, oddech i biofeedback
 
 Aplikacja webowa (React + TypeScript + Vite) łącząca techniki relaksacyjne, oddechowe i medytacyjne z treningiem
 poznawczym oraz prostym biofeedbackiem. Działa w całości w przeglądarce — bez backendu, bez kont użytkowników.

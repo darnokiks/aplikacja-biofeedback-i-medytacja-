@@ -97,7 +97,7 @@ export async function scheduleNativeReminder(reminder: Reminder) {
       {
         id: hashToInt(reminder.id),
         title: reminder.title,
-        body: reminder.notes || 'Przypomnienie ze Spokoju',
+        body: reminder.notes || 'Przypomnienie z Mental Wellness',
         schedule,
         extra: { kind: 'reminder', reminderId: reminder.id },
       },

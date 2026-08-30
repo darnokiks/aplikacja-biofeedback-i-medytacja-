@@ -1,6 +1,6 @@
 {
-  "name": "Spokój — medytacja, oddech i biofeedback",
-  "short_name": "Spokój",
+  "name": "Mental Wellness — medytacja, oddech i biofeedback",
+  "short_name": "Mental Wellness",
   "description": "Medytacja, oddech, relaksacja, trening mózgu i biofeedback w jednej aplikacji.",
   "start_url": "./index.html",
   "scope": "./",
