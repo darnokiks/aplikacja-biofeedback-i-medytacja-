@@ -13,6 +13,18 @@ interface ModuleDef {
 
 const CATEGORIES: { name: string; modules: ModuleDef[] }[] = [
   {
+    name: 'Rutyna dnia',
+    modules: [
+      {
+        to: '/budzik',
+        icon: '⏰',
+        title: 'Budzik i przypomnienia',
+        description: 'Zaplanuj poranne wstawanie z automatycznym startem oddechu, albo ustaw przypomnienie o zadaniu.',
+        tag: 'Rutyna',
+      },
+    ],
+  },
+  {
     name: 'Oddech i relaksacja',
     modules: [
       {

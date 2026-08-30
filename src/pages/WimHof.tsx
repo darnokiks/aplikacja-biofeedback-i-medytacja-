@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Button, Card, Pill, SectionTitle } from '../components/ui';
 import { BreathOrb } from '../components/BreathOrb';
 import { AMBIENT_TRACKS, playBeep, playChime, startAmbientTrack, unlockAudio, type AmbientHandle } from '../lib/audio';
@@ -52,6 +53,14 @@ export default function WimHof() {
     },
     [],
   );
+
+  const location = useLocation();
+  useEffect(() => {
+    if ((location.state as { autoStart?: boolean } | null)?.autoStart) {
+      startSession();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function speakIfOn(id: string, text: string) {
     if (!voiceOn) return;

@@ -25,7 +25,31 @@ Dane (historia sesji, wyniki gier) zapisywane są lokalnie w `localStorage`.
   w Safari na iOS ani w Firefoksie**, bo te przeglądarki nie implementują Web Bluetooth.
 - **Biblioteka muzyki** — sześć generatywnych utworów ambientowych (relaks/sen/skupienie/energia), w 100%
   syntezowanych przez Web Audio API; wybór utworu jest też dostępny jako tło w Wim Hof i Podróży światła.
+- **Budzik i przypomnienia** — alarmy (jednorazowe lub cykliczne, wybrane dni tygodnia) z opcjonalnym
+  auto-startem porannej rutyny (np. oddechu Wima Hofa) po wyłączeniu, oraz osobne przypomnienia (jednorazowe/
+  codzienne/tygodniowe). Patrz zastrzeżenie niżej — **niezawodne działanie z zablokowanym telefonem wymaga
+  natywnej apki**, nie samej przeglądarki.
 - **Postępy** — historia sesji, passa dni, statystyki i wykres aktywności.
+
+## Budzik — dwie warstwy, świadomie
+
+Żadna przeglądarka (w tym PWA) nie ma API pozwalającego niezawodnie „obudzić się o tej godzinie" przy zamkniętej
+karcie czy zablokowanym ekranie — to fundamentalne ograniczenie platformy webowej, nie luka w tej implementacji.
+Dlatego budzik działa w dwóch warstwach:
+
+1. **`src/components/AlarmEngine.tsx`** — silnik pierwszoplanowy: sprawdza alarmy/przypomnienia co ~15s, działa
+   tylko, gdy ta karta jest otwarta (i urządzenie nie śpi). Ma 10-minutowe okno tolerancji (a nie wymóg trafienia
+   dokładnie w tę samą minutę), żeby przeładowanie strony czy chwilowe uśpienie karty nie powodowały przegapienia
+   wyzwalacza. To jedyna warstwa aktywna w przeglądarce i w podglądzie Artifact.
+2. **`src/lib/nativeAlarms.ts`** — po zbudowaniu natywnej apki (patrz sekcja "Aplikacja mobilna" niżej) budzik
+   automatycznie przełącza się na `@capacitor/local-notifications`, czyli prawdziwe powiadomienia systemowe
+   Androida/iOS, które działają nawet przy zablokowanym ekranie. Strona `/budzik` planuje powiadomienia w obu
+   warstwach jednocześnie — na wersji webowej realnie działa tylko silnik pierwszoplanowy, na natywnej przejmują
+   powiadomienia systemowe.
+
+Auto-start porannej rutyny po wyłączeniu budzika jest obecnie podpięty tylko pod **Oddech Wima Hofa**
+(`useLocation().state?.autoStart` w `src/pages/WimHof.tsx`) — dodanie tego do kolejnych modułów wymaga tej samej,
+prostej zmiany w danym komponencie.
 
 ## Głos i narracja
 

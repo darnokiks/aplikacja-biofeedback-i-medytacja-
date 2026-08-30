@@ -4,6 +4,7 @@ import { Logo } from './Logo';
 
 const PRIMARY_NAV = [
   { to: '/', label: 'Start', icon: '🏠', end: true },
+  { to: '/budzik', label: 'Budzik', icon: '⏰' },
   { to: '/oddech', label: 'Oddech', icon: '🌬️' },
   { to: '/medytacja', label: 'Medytacja', icon: '🧘' },
   { to: '/focus', label: 'Focus/Sen', icon: '🎧' },

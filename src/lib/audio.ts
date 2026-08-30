@@ -363,3 +363,55 @@ export function startAmbientTrack(trackId: string, volume = 0.35): AmbientHandle
     },
   };
 }
+
+export interface AlarmToneHandle {
+  stop: () => void;
+}
+
+/**
+ * Pętla tonu budzika — łagodnie narastająca głośność, dwa naprzemienne tony, żeby budzić
+ * skutecznie, ale bez ostrego, nieprzyjemnego pisku.
+ */
+export function startAlarmTone(volume = 0.5): AlarmToneHandle {
+  const c = getCtx();
+  const master = c.createGain();
+  master.gain.setValueAtTime(0, c.currentTime);
+  master.gain.linearRampToValueAtTime(volume, c.currentTime + 3);
+  master.connect(c.destination);
+
+  let stopped = false;
+  let timeoutId: number | null = null;
+
+  function ping() {
+    if (stopped) return;
+    const now = c.currentTime;
+    [880, 1046.5].forEach((freq, i) => {
+      const osc = c.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      const g = c.createGain();
+      const start = now + i * 0.22;
+      g.gain.setValueAtTime(0, start);
+      g.gain.linearRampToValueAtTime(0.5, start + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.001, start + 0.28);
+      osc.connect(g).connect(master);
+      osc.start(start);
+      osc.stop(start + 0.3);
+    });
+    timeoutId = window.setTimeout(ping, 900);
+  }
+  ping();
+
+  return {
+    stop: () => {
+      if (stopped) return;
+      stopped = true;
+      if (timeoutId) window.clearTimeout(timeoutId);
+      const t = c.currentTime;
+      master.gain.cancelScheduledValues(t);
+      master.gain.setValueAtTime(master.gain.value, t);
+      master.gain.linearRampToValueAtTime(0, t + 0.4);
+      setTimeout(() => master.disconnect(), 500);
+    },
+  };
+}

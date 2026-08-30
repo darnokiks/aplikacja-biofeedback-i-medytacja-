@@ -1,5 +1,6 @@
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import { Layout } from './components/Layout';
+import { AlarmEngine } from './components/AlarmEngine';
 import Home from './pages/Home';
 import WimHof from './pages/WimHof';
 import Jacobson from './pages/Jacobson';
@@ -15,11 +16,13 @@ import NBackGame from './pages/games/NBackGame';
 import Biofeedback from './pages/Biofeedback';
 import Devices from './pages/Devices';
 import Progress from './pages/Progress';
+import Alarms from './pages/Alarms';
 import NotFound from './pages/NotFound';
 
 export default function App() {
   return (
     <HashRouter>
+      <AlarmEngine />
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -37,6 +40,7 @@ export default function App() {
           <Route path="/biofeedback" element={<Biofeedback />} />
           <Route path="/urzadzenia" element={<Devices />} />
           <Route path="/postepy" element={<Progress />} />
+          <Route path="/budzik" element={<Alarms />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
