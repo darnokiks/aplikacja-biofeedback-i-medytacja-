@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { MoreHorizontal } from 'lucide-react';
+import { LogIn, MoreHorizontal } from 'lucide-react';
 import { Logo } from './Logo';
 import { ROUTE_ICONS } from '../lib/icons';
+import { getCurrentUser, onAuthChange, signOut, type AuthUser } from '../lib/auth';
 
 const PRIMARY_NAV = [
   { to: '/', label: 'Start', end: true },
@@ -91,6 +92,38 @@ function MoreMenu() {
   );
 }
 
+function AccountSlot() {
+  const [user, setUser] = useState<AuthUser | null>(() => getCurrentUser());
+
+  useEffect(() => onAuthChange(() => setUser(getCurrentUser())), []);
+
+  if (!user) {
+    return (
+      <NavLink to="/logowanie" className={navLinkClass}>
+        <LogIn className="h-[18px] w-[18px]" aria-hidden />
+        <span className="hidden sm:inline">Zaloguj się</span>
+      </NavLink>
+    );
+  }
+
+  return (
+    <button
+      onClick={signOut}
+      title="Kliknij, aby się wylogować"
+      className="flex shrink-0 items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-medium text-[var(--color-muted)] transition hover:bg-white/5 hover:text-[var(--color-text)]"
+    >
+      {user.avatarUrl ? (
+        <img src={user.avatarUrl} alt="" referrerPolicy="no-referrer" className="h-6 w-6 rounded-full" />
+      ) : (
+        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-primary)]/20 text-xs font-semibold text-[var(--color-primary)]">
+          {user.name.charAt(0).toUpperCase()}
+        </span>
+      )}
+      <span className="hidden sm:inline">{user.name}</span>
+    </button>
+  );
+}
+
 export function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen">
@@ -112,6 +145,7 @@ export function Layout({ children }: { children: ReactNode }) {
               })}
             </nav>
             <MoreMenu />
+            <AccountSlot />
           </div>
         </div>
       </header>

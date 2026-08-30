@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Flame } from 'lucide-react';
 import { Card, Pill, SectionTitle } from '../components/ui';
-import { LogoMark } from '../components/Logo';
 import { ROUTE_ICONS } from '../lib/icons';
 import { getStreak, getTotalMinutes, getSessions } from '../lib/storage';
 
@@ -142,10 +141,9 @@ export default function Home() {
 
   return (
     <div>
-      <div className="relative mb-10 overflow-hidden">
-        <div className="pointer-events-none absolute -left-10 -top-16 opacity-70 blur-[2px]">
-          <LogoMark size={220} className="h-36 w-36 sm:h-52 sm:w-52 lg:h-64 lg:w-64" />
-        </div>
+      <div className="relative mb-10 overflow-hidden rounded-3xl border border-white/5 bg-gradient-to-br from-[var(--color-surface)] to-[var(--color-bg)] px-6 py-10 sm:px-10 sm:py-14">
+        <div className="pointer-events-none absolute -top-20 -right-16 h-64 w-64 rounded-full bg-[var(--color-primary)]/20 blur-[90px]" />
+        <div className="pointer-events-none absolute -bottom-24 -left-10 h-56 w-56 rounded-full bg-[var(--color-accent)]/15 blur-[90px]" />
         <div className="relative">
           <SectionTitle
             eyebrow="Witaj ponownie"

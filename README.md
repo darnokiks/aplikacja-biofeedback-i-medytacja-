@@ -66,6 +66,29 @@ Biblioteka muzyki ambientowej działa analogicznie: `startAmbientTrack()` w `src
 generuje utwór w 100% syntetycznie. Oba manifesty są dziś puste — folder `public/audio/` to gotowe miejsce na
 przyszłe nagrania i muzykę, z pełną listą oczekiwanych nazw plików w `public/audio/README.md`.
 
+## Logowanie (Google / Facebook / X)
+
+Strona `/logowanie` (i przycisk konta w nagłówku) obsługuje logowanie przez trzech dostawców, w całości po stronie
+klienta — zgodnie z resztą aplikacji, **bez backendu i bez własnych kont**. Zalogowanie służy wyłącznie do
+personalizacji interfejsu (imię, awatar w nagłówku); nie synchronizuje żadnych danych w chmurze — historia sesji,
+streak i wyniki gier nadal żyją tylko w `localStorage` tego urządzenia.
+
+- **Google i Facebook działają w pełni**, ale wymagają własnego klucza dostawcy — bez niego przycisk pokazuje
+  „wymaga konfiguracji” i po kliknięciu zwraca czytelny błąd zamiast fałszywie udawać, że coś się dzieje:
+  - Google: [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials) → „Create
+    credentials” → „OAuth client ID” (typ „Web application”) → dodaj domenę do „Authorized JavaScript origins” →
+    wklej Client ID do `GOOGLE_CLIENT_ID` w `src/lib/auth.ts`.
+  - Facebook: [developers.facebook.com/apps](https://developers.facebook.com/apps) → nowa aplikacja → dodaj produkt
+    „Facebook Login” → wklej App ID do `FACEBOOK_APP_ID` w `src/lib/auth.ts`.
+  - Tożsamość z obu dostawców jest odczytywana wyłącznie po stronie przeglądarki (token Google jest dekodowany
+    lokalnie, bez weryfikacji podpisu) — to świadomy kompromis pasujący do architektury „wszystko lokalnie”, a nie
+    bezpieczne uwierzytelnienie serwerowe.
+- **X (Twitter) nie jest podłączony i nie może być bez backendu.** Prawdziwe logowanie OAuth 2.0 wymaga wymiany
+  kodu autoryzacji na token przez `api.twitter.com/2/oauth2/token`, który nie wysyła nagłówków CORS pozwalających
+  wywołać go bezpośrednio z przeglądarki — to ograniczenie samego X, nie tej aplikacji. Przycisk zostaje w
+  interfejsie jako gotowe miejsce do podłączenia, gdyby w przyszłości doszła choćby minimalna funkcja serwerowa do
+  samej wymiany tokenu.
+
 ## Uwagi dotyczące bezpieczeństwa
 
 Aplikacja ma charakter edukacyjno-relaksacyjny i **nie zastępuje porady medycznej**. Nie opisuj jej ani jej modułów

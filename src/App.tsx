@@ -17,6 +17,7 @@ import Biofeedback from './pages/Biofeedback';
 import Devices from './pages/Devices';
 import Progress from './pages/Progress';
 import Alarms from './pages/Alarms';
+import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 
 export default function App() {
@@ -41,6 +42,7 @@ export default function App() {
           <Route path="/urzadzenia" element={<Devices />} />
           <Route path="/postepy" element={<Progress />} />
           <Route path="/budzik" element={<Alarms />} />
+          <Route path="/logowanie" element={<Login />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
