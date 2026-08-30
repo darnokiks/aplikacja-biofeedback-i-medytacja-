@@ -144,7 +144,7 @@ export default function Home() {
     <div>
       <div className="relative mb-10 overflow-hidden">
         <div className="pointer-events-none absolute -left-10 -top-16 opacity-70 blur-[2px]">
-          <LogoMark size={220} />
+          <LogoMark size={220} className="h-36 w-36 sm:h-52 sm:w-52 lg:h-64 lg:w-64" />
         </div>
         <div className="relative">
           <SectionTitle

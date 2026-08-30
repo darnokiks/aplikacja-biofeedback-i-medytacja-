@@ -1,19 +1,14 @@
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs>
-  <radialGradient id="bg" cx="35%" cy="28%" r="85%">
-    <stop offset="0%" stop-color="#1e2b4a" />
+  <radialGradient id="bg" cx="35%" cy="30%" r="80%">
+    <stop offset="0%" stop-color="#1b2740" />
     <stop offset="55%" stop-color="#0f172a" />
-    <stop offset="100%" stop-color="#05070d" />
+    <stop offset="100%" stop-color="#060a14" />
   </radialGradient>
-  <radialGradient id="halo" cx="42%" cy="38%" r="70%">
-    <stop offset="0%" stop-color="#7c5cf0" stop-opacity="0.35" />
-    <stop offset="100%" stop-color="#7c5cf0" stop-opacity="0" />
-  </radialGradient>
-  <radialGradient id="orb" cx="42%" cy="38%" r="62%">
-    <stop offset="0%" stop-color="#d4fdf3" />
-    <stop offset="32%" stop-color="#5eead4" />
-    <stop offset="68%" stop-color="#2fae8e" />
-    <stop offset="100%" stop-color="#7c5cf0" stop-opacity="0" />
-  </radialGradient></defs><rect width="512" height="512" fill="url(#bg)" />
-  <circle cx="256" cy="256" r="220" fill="url(#halo)" />
-  <circle cx="256" cy="256" r="150" fill="none" stroke="#ffffff" stroke-opacity="0.22" stroke-width="16" />
-  <circle cx="256" cy="256" r="124" fill="url(#orb)" /></svg>
+  <radialGradient id="orb" cx="40%" cy="35%" r="65%">
+    <stop offset="0%" stop-color="#6ee7c9" />
+    <stop offset="55%" stop-color="#34b895" stop-opacity="0.85" />
+    <stop offset="100%" stop-color="#a78bfa" stop-opacity="0" />
+  </radialGradient></defs><rect width="512" height="512" rx="112" fill="url(#bg)" />
+  <circle cx="256" cy="256" r="188" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="10" />
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="10" />
+  <circle cx="256" cy="256" r="112" fill="url(#orb)" /></svg>

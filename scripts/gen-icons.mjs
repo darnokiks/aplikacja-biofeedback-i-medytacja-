@@ -5,44 +5,40 @@ import sharp from 'sharp';
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
 
 const MARK_DEFS = `
-  <radialGradient id="halo" cx="42%" cy="38%" r="70%">
-    <stop offset="0%" stop-color="#7c5cf0" stop-opacity="0.35" />
-    <stop offset="100%" stop-color="#7c5cf0" stop-opacity="0" />
-  </radialGradient>
-  <radialGradient id="orb" cx="42%" cy="38%" r="62%">
-    <stop offset="0%" stop-color="#d4fdf3" />
-    <stop offset="32%" stop-color="#5eead4" />
-    <stop offset="68%" stop-color="#2fae8e" />
-    <stop offset="100%" stop-color="#7c5cf0" stop-opacity="0" />
+  <radialGradient id="orb" cx="40%" cy="35%" r="65%">
+    <stop offset="0%" stop-color="#6ee7c9" />
+    <stop offset="55%" stop-color="#34b895" stop-opacity="0.85" />
+    <stop offset="100%" stop-color="#a78bfa" stop-opacity="0" />
   </radialGradient>`;
 
-// Jeden gruby pierścień i miękka poświata zamiast dwóch cienkich linii z poprzedniej wersji —
-// cienkie 10px obrysy przy przeskalowaniu do favicony/ikon Androida rozpadały się na
-// postrzępione, "rozpikselowane" piksele. Grubszy, mniej szczegółowy kształt skaluje się czysto.
 const MARK_SHAPES = `
-  <circle cx="256" cy="256" r="220" fill="url(#halo)" />
-  <circle cx="256" cy="256" r="150" fill="none" stroke="#ffffff" stroke-opacity="0.22" stroke-width="16" />
-  <circle cx="256" cy="256" r="124" fill="url(#orb)" />`;
+  <circle cx="256" cy="256" r="188" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="10" />
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="10" />
+  <circle cx="256" cy="256" r="112" fill="url(#orb)" />`;
 
 const BG_DEF = `
-  <radialGradient id="bg" cx="35%" cy="28%" r="85%">
-    <stop offset="0%" stop-color="#1e2b4a" />
+  <radialGradient id="bg" cx="35%" cy="30%" r="80%">
+    <stop offset="0%" stop-color="#1b2740" />
     <stop offset="55%" stop-color="#0f172a" />
-    <stop offset="100%" stop-color="#05070d" />
+    <stop offset="100%" stop-color="#060a14" />
   </radialGradient>`;
 
 const svg = (defs, body) =>
   `<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs>${defs}</defs>${body}</svg>`;
 
 // "mark" = sama iskra na przezroczystym tle (warstwa foreground adaptacyjnej ikony Androida,
-// zawartość ikony maskowalnej). "full" = kompletna ikona z tłem (web/PWA, legacy Android, iOS —
-// czyli wszędzie tam, gdzie system NIE dokłada własnego tła/maski).
+// zawartość ikony maskowalnej). "fullRounded" = tło z zaokrąglonymi rogami — wygląd używany na
+// weowych ikonach/favicon (tam nikt automatycznie nie maskuje ikony). "fullSquare" = to samo, ale
+// pełny kwadrat bez zaokrąglenia — dla natywnego Androida/iOS, gdzie system SAM dokłada własną
+// maskę (koło/"squircle"/zaokrąglony kwadrat); pre-zaokrąglony róg dawałby tam podwójne, krzywe
+// zaokrąglenie.
 const markSvg = svg(MARK_DEFS, MARK_SHAPES);
-const fullSvg = svg(BG_DEF + MARK_DEFS, `<rect width="512" height="512" fill="url(#bg)" />${MARK_SHAPES}`);
+const fullSvgRounded = svg(BG_DEF + MARK_DEFS, `<rect width="512" height="512" rx="112" fill="url(#bg)" />${MARK_SHAPES}`);
+const fullSvgSquare = svg(BG_DEF + MARK_DEFS, `<rect width="512" height="512" fill="url(#bg)" />${MARK_SHAPES}`);
 const bgOnlySvg = svg(BG_DEF, `<rect width="512" height="512" fill="url(#bg)" />`);
 
 mkdirSync('./public/icons', { recursive: true });
-writeFileSync('./scripts/icon.svg', fullSvg); // podgląd do otwarcia w przeglądarce/edytorze
+writeFileSync('./scripts/icon.svg', fullSvgRounded); // podgląd do otwarcia w przeglądarce/edytorze
 
 /** Rasteryzuje SVG bezpośrednio w docelowej rozdzielczości (przez `density`), zamiast renderować
  * raz i pomniejszać bitmapowo — to właśnie ten drugi sposób dawał widoczną pikselozę/aliasing
@@ -74,7 +70,7 @@ const webSizes = [
   { size: 32, out: './public/icons/favicon-32.png' },
 ];
 for (const { size, out } of webSizes) {
-  writeFileSync(out, await renderSquare(fullSvg, size));
+  writeFileSync(out, await renderSquare(fullSvgRounded, size));
   console.log('wrote', out);
 }
 
@@ -98,7 +94,7 @@ if (existsSync(androidResDir)) {
   ];
   for (const { name, legacy, fg } of densities) {
     const dir = `${androidResDir}/mipmap-${name}`;
-    const legacyPng = await renderSquare(fullSvg, legacy);
+    const legacyPng = await renderSquare(fullSvgSquare, legacy);
     writeFileSync(`${dir}/ic_launcher.png`, legacyPng);
     writeFileSync(`${dir}/ic_launcher_round.png`, legacyPng);
     writeFileSync(`${dir}/ic_launcher_foreground.png`, await markOnTransparent(fg));
@@ -115,6 +111,6 @@ if (existsSync(androidResDir)) {
 // dlatego renderujemy pełny kwadrat bez przezroczystości. ---
 const iosIconDir = './ios/App/App/Assets.xcassets/AppIcon.appiconset';
 if (existsSync(iosIconDir)) {
-  writeFileSync(`${iosIconDir}/AppIcon-512@2x.png`, await renderSquare(fullSvg, 1024));
+  writeFileSync(`${iosIconDir}/AppIcon-512@2x.png`, await renderSquare(fullSvgSquare, 1024));
   console.log('wrote iOS app icon');
 }
