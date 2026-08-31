@@ -39,23 +39,15 @@ export function hasVoices(): boolean {
   return isTtsAvailable() && window.speechSynthesis.getVoices().length > 0;
 }
 
-// Chrome ma udokumentowany błąd: speechSynthesis.speak() wywołane od razu po cancel() bywa po
-// cichu ignorowane (utterance nigdy się nie zaczyna, bez błędu). Odkładamy właściwe wywołanie
-// o jeden tick, żeby dać przeglądarce czas na faktyczne wyczyszczenie kolejki.
-const SPEAK_AFTER_CANCEL_DELAY_MS = 60;
+// Udokumentowany błąd Chrome: speechSynthesis.speak() wywołane od razu po cancel() bywa po cichu
+// ignorowane. Anulujemy tylko, gdy coś faktycznie mówi/czeka w kolejce (unika niepotrzebnego
+// cancel() w typowym przypadku, gdy poprzednia fraza już dawno się skończyła), a jeśli faktycznie
+// anulujemy, odkładamy kolejne wywołanie o jeden tick.
+const SPEAK_AFTER_CANCEL_DELAY_MS = 80;
 
-// Drugi udokumentowany błąd Chrome: speechSynthesis usypia/przerywa mowę po ~15s bezczynności
-// (np. długi tekst bez przerw), jeśli nikt nie "budzi" go wywołaniem resume(). Odświeżamy co 5s,
-// dopóki dana wypowiedź trwa.
-const RESUME_HEARTBEAT_MS = 5000;
-
-// Trzeci, najbardziej podstępny udokumentowany błąd: przeglądarki (głównie Chromium) NIE
+// Drugi, najbardziej podstępny udokumentowany błąd: przeglądarki (głównie Chromium) NIE
 // utrzymują same silnej referencji do obiektu SpeechSynthesisUtterance podczas mówienia — jeśli
-// nic w JS-ie go nie trzyma, silnik JS może go zebrać (garbage collection) w trakcie wypowiedzi,
-// ucinając ją bez żadnego zdarzenia error. Krótki, izolowany test (np. jedno kliknięcie od razu
-// po wejściu na stronę) rzadko na to trafia; długa sesja z dużym ruchem pamięci (timery, Web
-// Audio) trafia na to prawie zawsze — dokładnie tak to wyglądało w tej aplikacji: przycisk
-// testowy działał, a narracja w trakcie sesji Wima Hofa/Jacobsona milczała bez śladu błędu.
+// nic w JS-ie go nie trzyma, silnik JS może go zebrać (garbage collection) w trakcie wypowiedzi.
 // Utrzymujemy więc jawną referencję do aktualnie mówionego `utterance`, dopóki się nie zakończy.
 let currentUtterance: SpeechSynthesisUtterance | null = null;
 
@@ -64,47 +56,49 @@ export function speak(
   opts: { rate?: number; pitch?: number; onEnd?: () => void; onError?: (reason: string) => void } = {},
 ) {
   if (!isTtsAvailable()) {
+    console.warn('[tts] speechSynthesis niedostępne w tej przeglądarce');
     opts.onError?.('unsupported');
     opts.onEnd?.();
     return;
   }
   if (!voicesLoaded) loadVoices();
 
-  window.setTimeout(() => {
-    const utter = new SpeechSynthesisUtterance(text);
-    utter.lang = 'pl-PL';
-    if (plVoice) utter.voice = plVoice;
-    utter.rate = opts.rate ?? 0.92;
-    utter.pitch = opts.pitch ?? 1;
-    currentUtterance = utter;
+  const wasActive = window.speechSynthesis.speaking || window.speechSynthesis.pending;
+  if (wasActive) window.speechSynthesis.cancel();
+  console.info('[tts] speak() zaplanowane:', JSON.stringify(text.slice(0, 40)), 'głos:', plVoice?.name ?? '(domyślny)', 'anulowano poprzednią:', wasActive);
 
-    let heartbeat: number | null = null;
-    const clearHeartbeat = () => {
-      if (heartbeat !== null) {
-        window.clearInterval(heartbeat);
-        heartbeat = null;
-      }
-    };
-    utter.onstart = () => {
-      heartbeat = window.setInterval(() => window.speechSynthesis.resume(), RESUME_HEARTBEAT_MS);
-    };
-    utter.onend = () => {
-      clearHeartbeat();
-      if (currentUtterance === utter) currentUtterance = null;
-      opts.onEnd?.();
-    };
-    utter.onerror = (e) => {
-      clearHeartbeat();
-      if (currentUtterance === utter) currentUtterance = null;
-      opts.onError?.(e.error || 'unknown');
-      opts.onEnd?.();
-    };
-    window.speechSynthesis.speak(utter);
-  }, SPEAK_AFTER_CANCEL_DELAY_MS);
+  window.setTimeout(
+    () => {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'pl-PL';
+      if (plVoice) utter.voice = plVoice;
+      utter.rate = opts.rate ?? 0.92;
+      utter.pitch = opts.pitch ?? 1;
+      currentUtterance = utter;
+
+      utter.onstart = () => console.info('[tts] onstart — mowa faktycznie się rozpoczęła');
+      utter.onend = () => {
+        console.info('[tts] onend');
+        if (currentUtterance === utter) currentUtterance = null;
+        opts.onEnd?.();
+      };
+      utter.onerror = (e) => {
+        console.warn('[tts] onerror:', e.error);
+        if (currentUtterance === utter) currentUtterance = null;
+        opts.onError?.(e.error || 'unknown');
+        opts.onEnd?.();
+      };
+      window.speechSynthesis.speak(utter);
+      console.info('[tts] speechSynthesis.speak() wywołane, speaking:', window.speechSynthesis.speaking, 'pending:', window.speechSynthesis.pending);
+    },
+    wasActive ? SPEAK_AFTER_CANCEL_DELAY_MS : 0,
+  );
 }
 
 export function cancelSpeech() {
-  if (isTtsAvailable()) window.speechSynthesis.cancel();
+  if (isTtsAvailable() && (window.speechSynthesis.speaking || window.speechSynthesis.pending)) {
+    window.speechSynthesis.cancel();
+  }
   currentUtterance = null;
 }
 

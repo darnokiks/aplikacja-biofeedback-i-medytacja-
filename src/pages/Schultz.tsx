@@ -3,7 +3,6 @@ import { Flame } from 'lucide-react';
 import { Button, Card, SectionTitle } from '../components/ui';
 import { GuidedPlayer, type GuidedPhase } from '../components/GuidedPlayer';
 import { EducationPanel } from '../components/EducationPanel';
-import { VoiceTestButton } from '../components/VoiceTestButton';
 import { SCHULTZ_FORMULAS, SCHULTZ_INTRO, SCHULTZ_RETURN } from '../data/schultz';
 import { logSession } from '../lib/storage';
 import { unlockAudio } from '../lib/audio';
@@ -71,13 +70,10 @@ export default function Schultz() {
                 className="w-full accent-[var(--color-primary)]"
               />
             </div>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <label className="flex items-center gap-2 text-sm text-[var(--color-muted)]">
-                <input type="checkbox" checked={voiceOn} onChange={(e) => setVoiceOn(e.target.checked)} className="accent-[var(--color-primary)]" />
-                Narracja głosowa (PL)
-              </label>
-              <VoiceTestButton />
-            </div>
+            <label className="flex items-center gap-2 text-sm text-[var(--color-muted)]">
+              <input type="checkbox" checked={voiceOn} onChange={(e) => setVoiceOn(e.target.checked)} className="accent-[var(--color-primary)]" />
+              Narracja głosowa (PL)
+            </label>
             <p className="text-sm text-[var(--color-muted)]">
               Sesja obejmuje {SCHULTZ_FORMULAS.length} formuł i potrwa około{' '}
               {Math.round((SCHULTZ_FORMULAS.length * formulaSec + 30) / 60)} min.

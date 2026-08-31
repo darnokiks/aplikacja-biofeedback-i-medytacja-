@@ -4,8 +4,16 @@ import { AlertTriangle, PartyPopper, Sparkles } from 'lucide-react';
 import { Button, Card, Pill, SectionTitle } from '../components/ui';
 import { BreathOrb } from '../components/BreathOrb';
 import { EducationPanel } from '../components/EducationPanel';
-import { VoiceTestButton } from '../components/VoiceTestButton';
-import { AMBIENT_TRACKS, playChime, playSoftTone, startAmbientTrack, unlockAudio, type AmbientHandle } from '../lib/audio';
+import {
+  AMBIENT_TRACKS,
+  BREATH_TONE_STYLES,
+  getBreathToneStyle,
+  playBreathTone,
+  playChime,
+  startAmbientTrack,
+  unlockAudio,
+  type AmbientHandle,
+} from '../lib/audio';
 import { speakNarration } from '../lib/narration';
 import { logSession } from '../lib/storage';
 import { formatMMSS } from '../hooks/useTimer';
@@ -29,6 +37,7 @@ export default function WimHof() {
   const [musicOn, setMusicOn] = useState(true);
   const [musicVolume, setMusicVolume] = useState(0.35);
   const [musicTrack, setMusicTrack] = useState('heart-pulse');
+  const [breathToneId, setBreathToneId] = useState('classic-tone');
 
   const [phase, setPhase] = useState<Phase>('setup');
   const [currentRound, setCurrentRound] = useState(1);
@@ -68,7 +77,17 @@ export default function WimHof() {
 
   function speakIfOn(id: string, text: string) {
     if (!voiceOn) return;
-    speakNarration(id, text, { onError: () => setVoiceError(true) });
+    // Przyciszamy muzykę w tle na czas narracji — niezależnie od tego, czy to poprawia czytelność
+    // głosu, czy nie, to i tak dobra praktyka, żeby głos nie musiał "przebijać się" przez pad.
+    const restoreVolume = musicVolume;
+    musicRef.current?.setVolume(restoreVolume * 0.25);
+    speakNarration(id, text, {
+      onEnd: () => musicRef.current?.setVolume(restoreVolume),
+      onError: () => {
+        setVoiceError(true);
+        musicRef.current?.setVolume(restoreVolume);
+      },
+    });
   }
 
   function startSession() {
@@ -105,11 +124,11 @@ export default function WimHof() {
     }
     setBreathIndex(index);
     setBreathStage('in');
-    playSoftTone(560, 0.3, 0.16);
+    playBreathTone(getBreathToneStyle(breathToneId), 'in');
     const { inhale, exhale } = PACE_MS[pace];
     timeoutRef.current = window.setTimeout(() => {
       setBreathStage('out');
-      playSoftTone(380, 0.32, 0.14);
+      playBreathTone(getBreathToneStyle(breathToneId), 'out');
       timeoutRef.current = window.setTimeout(() => runBreathCycle(index + 1, round), exhale);
     }, inhale);
   }
@@ -120,7 +139,7 @@ export default function WimHof() {
     setBestHold(bestHoldRef.current);
     setPhase('recovery');
     setRecoverySecondsLeft(recoveryHoldSec);
-    playSoftTone(660, 0.4, 0.2);
+    playBreathTone(getBreathToneStyle(breathToneId), 'in', 0.22);
     speakIfOn('wimhof.recovery-start', 'Weź głęboki wdech i zatrzymaj powietrze.');
     let remaining = recoveryHoldSec;
     intervalRef.current = window.setInterval(() => {
@@ -258,12 +277,37 @@ export default function WimHof() {
                 className="w-full accent-[var(--color-primary)]"
               />
             </div>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <label className="flex items-center gap-2 text-sm text-[var(--color-muted)]">
-                <input type="checkbox" checked={voiceOn} onChange={(e) => setVoiceOn(e.target.checked)} className="accent-[var(--color-primary)]" />
-                Narracja głosowa (PL)
-              </label>
-              <VoiceTestButton />
+            <label className="flex items-center gap-2 text-sm text-[var(--color-muted)]">
+              <input type="checkbox" checked={voiceOn} onChange={(e) => setVoiceOn(e.target.checked)} className="accent-[var(--color-primary)]" />
+              Narracja głosowa (PL)
+            </label>
+            <div>
+              <p className="mb-2 text-sm text-[var(--color-muted)]">Dźwięk sygnału oddechu — kliknij, aby posłuchać i wybrać</p>
+              <div className="scrollbar-thin grid max-h-56 grid-cols-1 gap-1.5 overflow-y-auto rounded-lg border border-white/5 bg-[var(--color-surface-2)] p-2 sm:grid-cols-2">
+                {BREATH_TONE_STYLES.map((style) => {
+                  const selected = style.id === breathToneId;
+                  return (
+                    <button
+                      key={style.id}
+                      type="button"
+                      onClick={() => {
+                        unlockAudio();
+                        setBreathToneId(style.id);
+                        playBreathTone(style, 'in');
+                        window.setTimeout(() => playBreathTone(style, 'out'), 400);
+                      }}
+                      className={`rounded-lg px-3 py-2 text-left text-xs transition ${
+                        selected
+                          ? 'bg-[var(--color-primary)]/20 text-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/40'
+                          : 'text-[var(--color-muted)] hover:bg-white/5 hover:text-[var(--color-text)]'
+                      }`}
+                    >
+                      <span className="block font-medium">{style.name}</span>
+                      <span className="block text-[10px] opacity-80">{style.description}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
             <div>
               <label className="mb-2 flex items-center gap-2 text-sm text-[var(--color-muted)]">

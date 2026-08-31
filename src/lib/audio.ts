@@ -56,32 +56,93 @@ export function playBeep(freq = 880, duration = 0.12, volume = 0.3) {
   osc.stop(now + duration + 0.02);
 }
 
-/** Miękki, ciepły ton z wolniejszym narastaniem i cichą, wygładzającą oktawą — do częstych
- * sygnałów podczas sesji oddechowych, gdzie ostry "klik" zwykłego playBeep (krótki atak, jasna
- * barwa) powtarzany dziesiątki razy na rundę robi się męczący zamiast uspokajający. */
-export function playSoftTone(freq = 440, duration = 0.32, volume = 0.18) {
+/** Definicja jednego stylu dźwięku sygnału wdechu/wydechu — patrz BREATH_TONE_STYLES niżej.
+ * `overtoneMix`/`subMix` dodają cichą oktawę wyżej/niżej dla barwy (0 = czysty ton). */
+export interface BreathToneStyle {
+  id: string;
+  name: string;
+  description: string;
+  waveform: OscillatorType;
+  attack: number;
+  release: number;
+  overtoneMix: number;
+  subMix: number;
+  inFreq: number;
+  outFreq: number;
+}
+
+/** 20 wyraźnie różnych, syntezowanych (bez próbek) stylów sygnału oddechu — do wyboru w module
+ * Wim Hof, żeby każdy mógł dobrać dźwięk, który faktycznie mu odpowiada, zamiast jednego
+ * narzuconego "ciepłego" tonu. Wszystkie oparte o sine/triangle (bez ostrych fal piła/prostokąt),
+ * różnią się atakiem, wybrzmieniem, rejestrem i domieszką alikwotów/subbasu. */
+export const BREATH_TONE_STYLES: BreathToneStyle[] = [
+  { id: 'soft-bell', name: 'Miękki dzwoneczek', description: 'Delikatny, jasny dzwonek.', waveform: 'sine', attack: 0.05, release: 0.5, overtoneMix: 0.2, subMix: 0, inFreq: 660, outFreq: 440 },
+  { id: 'warm-wave', name: 'Ciepła fala', description: 'Okrągły, pełny ton z odrobiną basu.', waveform: 'triangle', attack: 0.08, release: 0.6, overtoneMix: 0.1, subMix: 0.15, inFreq: 520, outFreq: 350 },
+  { id: 'water-drop', name: 'Kropla wody', description: 'Krótki, czysty "plusk".', waveform: 'sine', attack: 0.02, release: 0.35, overtoneMix: 0.3, subMix: 0, inFreq: 700, outFreq: 500 },
+  { id: 'deep-gong', name: 'Głęboki gong', description: 'Niski, długo wybrzmiewający.', waveform: 'sine', attack: 0.1, release: 1.2, overtoneMix: 0.15, subMix: 0.3, inFreq: 300, outFreq: 220 },
+  { id: 'forest-chime', name: 'Leśny dzwonek', description: 'Lekki, świetlisty dźwięk.', waveform: 'triangle', attack: 0.04, release: 0.7, overtoneMix: 0.25, subMix: 0, inFreq: 780, outFreq: 600 },
+  { id: 'ocean-breath', name: 'Oddech oceanu', description: 'Powolny, głęboki, otulający.', waveform: 'sine', attack: 0.15, release: 0.9, overtoneMix: 0.05, subMix: 0.25, inFreq: 440, outFreq: 300 },
+  { id: 'crystal-tone', name: 'Kryształowy ton', description: 'Jasny, szklisty, wyraźny.', waveform: 'sine', attack: 0.03, release: 0.4, overtoneMix: 0.35, subMix: 0, inFreq: 880, outFreq: 660 },
+  { id: 'singing-bowl', name: 'Miska tybetańska', description: 'Klasyczny, długo śpiewający dźwięk.', waveform: 'sine', attack: 0.12, release: 1.5, overtoneMix: 0.2, subMix: 0.2, inFreq: 330, outFreq: 246 },
+  { id: 'gentle-pulse', name: 'Delikatny puls', description: 'Krótki, miękki, prawie niezauważalny.', waveform: 'triangle', attack: 0.06, release: 0.3, overtoneMix: 0, subMix: 0.1, inFreq: 500, outFreq: 350 },
+  { id: 'morning-dew', name: 'Poranna rosa', description: 'Świeży, lekko błyszczący.', waveform: 'sine', attack: 0.04, release: 0.5, overtoneMix: 0.15, subMix: 0, inFreq: 740, outFreq: 550 },
+  { id: 'warm-marimba', name: 'Ciepła marimba', description: 'Drewniany, przyjazny "pluck".', waveform: 'triangle', attack: 0.01, release: 0.4, overtoneMix: 0.1, subMix: 0, inFreq: 587, outFreq: 440 },
+  { id: 'deep-breath', name: 'Głęboki oddech', description: 'Bardzo niski, bez jasnych tonów.', waveform: 'sine', attack: 0.1, release: 0.8, overtoneMix: 0, subMix: 0.35, inFreq: 260, outFreq: 190 },
+  { id: 'silver-bell', name: 'Srebrny dzwonek', description: 'Wyraźny, metaliczny (ale nie ostry).', waveform: 'sine', attack: 0.03, release: 0.6, overtoneMix: 0.4, subMix: 0, inFreq: 900, outFreq: 700 },
+  { id: 'calm-wave', name: 'Spokojna fala', description: 'Zbalansowany, uniwersalny.', waveform: 'triangle', attack: 0.1, release: 0.7, overtoneMix: 0.1, subMix: 0.1, inFreq: 460, outFreq: 320 },
+  { id: 'bamboo-tone', name: 'Bambusowy ton', description: 'Krótki, drewniany, naturalny.', waveform: 'triangle', attack: 0.02, release: 0.35, overtoneMix: 0.05, subMix: 0, inFreq: 620, outFreq: 460 },
+  { id: 'night-relax', name: 'Nocny relaks', description: 'Bardzo wolny, ciemny, kojący.', waveform: 'sine', attack: 0.15, release: 1.0, overtoneMix: 0.1, subMix: 0.3, inFreq: 320, outFreq: 240 },
+  { id: 'bright-ray', name: 'Jasny promyk', description: 'Energiczny, ale wciąż miękki.', waveform: 'sine', attack: 0.02, release: 0.3, overtoneMix: 0.3, subMix: 0, inFreq: 820, outFreq: 600 },
+  { id: 'velvet-tone', name: 'Aksamitny ton', description: 'Gładki, ciepły, bez ostrych krawędzi.', waveform: 'triangle', attack: 0.08, release: 0.5, overtoneMix: 0.08, subMix: 0.18, inFreq: 480, outFreq: 360 },
+  { id: 'mountain-wind', name: 'Górski wiatr', description: 'Przestrzenny, powolny, otwarty.', waveform: 'sine', attack: 0.12, release: 0.9, overtoneMix: 0.12, subMix: 0.2, inFreq: 400, outFreq: 280 },
+  { id: 'classic-tone', name: 'Klasyczny ton', description: 'Domyślny — zbalansowany środek.', waveform: 'sine', attack: 0.06, release: 0.32, overtoneMix: 0.15, subMix: 0, inFreq: 560, outFreq: 380 },
+];
+
+export function getBreathToneStyle(id: string): BreathToneStyle {
+  return BREATH_TONE_STYLES.find((s) => s.id === id) ?? BREATH_TONE_STYLES[BREATH_TONE_STYLES.length - 1];
+}
+
+/** Odtwarza wybrany styl sygnału oddechu (patrz BREATH_TONE_STYLES) dla fazy wdechu lub wydechu. */
+export function playBreathTone(style: BreathToneStyle, stage: 'in' | 'out', volume = 0.18) {
+  const freq = stage === 'in' ? style.inFreq : style.outFreq;
   const c = getCtx();
   const now = c.currentTime;
-  const osc = c.createOscillator();
-  osc.type = 'sine';
-  osc.frequency.value = freq;
-  const overtone = c.createOscillator();
-  overtone.type = 'sine';
-  overtone.frequency.value = freq * 2;
-  const overtoneGain = c.createGain();
-  overtoneGain.gain.value = 0.15;
+  const totalDur = style.attack + style.release;
 
   const g = c.createGain();
   g.gain.setValueAtTime(0, now);
-  g.gain.linearRampToValueAtTime(volume, now + 0.06);
-  g.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+  g.gain.linearRampToValueAtTime(volume, now + style.attack);
+  g.gain.exponentialRampToValueAtTime(0.0001, now + totalDur);
+  g.connect(c.destination);
 
-  overtone.connect(overtoneGain).connect(g);
-  osc.connect(g).connect(c.destination);
+  const osc = c.createOscillator();
+  osc.type = style.waveform;
+  osc.frequency.value = freq;
+  osc.connect(g);
   osc.start(now);
-  overtone.start(now);
-  osc.stop(now + duration + 0.05);
-  overtone.stop(now + duration + 0.05);
+  osc.stop(now + totalDur + 0.05);
+
+  if (style.overtoneMix > 0) {
+    const overtone = c.createOscillator();
+    overtone.type = style.waveform;
+    overtone.frequency.value = freq * 2;
+    const overtoneGain = c.createGain();
+    overtoneGain.gain.value = style.overtoneMix;
+    overtone.connect(overtoneGain).connect(g);
+    overtone.start(now);
+    overtone.stop(now + totalDur + 0.05);
+  }
+
+  if (style.subMix > 0) {
+    const sub = c.createOscillator();
+    sub.type = 'sine';
+    sub.frequency.value = freq / 2;
+    const subGain = c.createGain();
+    subGain.gain.value = style.subMix;
+    sub.connect(subGain).connect(g);
+    sub.start(now);
+    sub.stop(now + totalDur + 0.05);
+  }
 }
 
 /** Sygnał końca ćwiczenia — dwa tony. */
