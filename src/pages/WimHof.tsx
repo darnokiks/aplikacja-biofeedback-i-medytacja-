@@ -23,7 +23,7 @@ export default function WimHof() {
   const [breathsPerRound, setBreathsPerRound] = useState(30);
   const [pace, setPace] = useState<Pace>('medium');
   const [recoveryHoldSec, setRecoveryHoldSec] = useState(15);
-  const [voiceOn, setVoiceOn] = useState(false);
+  const [voiceOn, setVoiceOn] = useState(true);
   const [voiceError, setVoiceError] = useState(false);
   const [musicOn, setMusicOn] = useState(true);
   const [musicVolume, setMusicVolume] = useState(0.35);

@@ -254,10 +254,10 @@ export const AMBIENT_TRACKS: AmbientTrack[] = [
     id: 'heart-pulse',
     name: 'Puls serca',
     mood: 'energia',
-    description: 'Powolne, rytmiczne tętnienie głośności — dobre tło do oddechu Wima Hofa.',
+    description: 'Ciepły pad z delikatnym, powolnym tętnieniem głośności — przyjazne tło do oddechu Wima Hofa.',
     chordHz: [87.31, 110.0, 130.81, 174.61],
-    oscType: 'sawtooth',
-    filterBase: 900,
+    oscType: 'triangle',
+    filterBase: 1200,
     filterSweepPeriodSec: 22,
     pulseBpm: 12,
   },
@@ -410,7 +410,7 @@ function startSynthAmbientTrack(track: AmbientTrack, volume: number): AmbientHan
     pulseLfo.type = 'sine';
     pulseLfo.frequency.value = track.pulseBpm / 60;
     const pulseGain = c.createGain();
-    pulseGain.gain.value = volume * 0.18;
+    pulseGain.gain.value = volume * 0.1;
     pulseLfo.connect(pulseGain).connect(master.gain);
     pulseLfo.start(now);
     stoppable.push({ stop: () => pulseLfo.stop() });
