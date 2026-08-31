@@ -56,6 +56,34 @@ export function playBeep(freq = 880, duration = 0.12, volume = 0.3) {
   osc.stop(now + duration + 0.02);
 }
 
+/** Miękki, ciepły ton z wolniejszym narastaniem i cichą, wygładzającą oktawą — do częstych
+ * sygnałów podczas sesji oddechowych, gdzie ostry "klik" zwykłego playBeep (krótki atak, jasna
+ * barwa) powtarzany dziesiątki razy na rundę robi się męczący zamiast uspokajający. */
+export function playSoftTone(freq = 440, duration = 0.32, volume = 0.18) {
+  const c = getCtx();
+  const now = c.currentTime;
+  const osc = c.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.value = freq;
+  const overtone = c.createOscillator();
+  overtone.type = 'sine';
+  overtone.frequency.value = freq * 2;
+  const overtoneGain = c.createGain();
+  overtoneGain.gain.value = 0.15;
+
+  const g = c.createGain();
+  g.gain.setValueAtTime(0, now);
+  g.gain.linearRampToValueAtTime(volume, now + 0.06);
+  g.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+  overtone.connect(overtoneGain).connect(g);
+  osc.connect(g).connect(c.destination);
+  osc.start(now);
+  overtone.start(now);
+  osc.stop(now + duration + 0.05);
+  overtone.stop(now + duration + 0.05);
+}
+
 /** Sygnał końca ćwiczenia — dwa tony. */
 export function playChime() {
   playBeep(660, 0.18, 0.28);

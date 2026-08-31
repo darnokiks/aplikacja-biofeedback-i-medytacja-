@@ -49,6 +49,16 @@ const SPEAK_AFTER_CANCEL_DELAY_MS = 60;
 // dopóki dana wypowiedź trwa.
 const RESUME_HEARTBEAT_MS = 5000;
 
+// Trzeci, najbardziej podstępny udokumentowany błąd: przeglądarki (głównie Chromium) NIE
+// utrzymują same silnej referencji do obiektu SpeechSynthesisUtterance podczas mówienia — jeśli
+// nic w JS-ie go nie trzyma, silnik JS może go zebrać (garbage collection) w trakcie wypowiedzi,
+// ucinając ją bez żadnego zdarzenia error. Krótki, izolowany test (np. jedno kliknięcie od razu
+// po wejściu na stronę) rzadko na to trafia; długa sesja z dużym ruchem pamięci (timery, Web
+// Audio) trafia na to prawie zawsze — dokładnie tak to wyglądało w tej aplikacji: przycisk
+// testowy działał, a narracja w trakcie sesji Wima Hofa/Jacobsona milczała bez śladu błędu.
+// Utrzymujemy więc jawną referencję do aktualnie mówionego `utterance`, dopóki się nie zakończy.
+let currentUtterance: SpeechSynthesisUtterance | null = null;
+
 export function speak(
   text: string,
   opts: { rate?: number; pitch?: number; onEnd?: () => void; onError?: (reason: string) => void } = {},
@@ -66,6 +76,7 @@ export function speak(
     if (plVoice) utter.voice = plVoice;
     utter.rate = opts.rate ?? 0.92;
     utter.pitch = opts.pitch ?? 1;
+    currentUtterance = utter;
 
     let heartbeat: number | null = null;
     const clearHeartbeat = () => {
@@ -79,10 +90,12 @@ export function speak(
     };
     utter.onend = () => {
       clearHeartbeat();
+      if (currentUtterance === utter) currentUtterance = null;
       opts.onEnd?.();
     };
     utter.onerror = (e) => {
       clearHeartbeat();
+      if (currentUtterance === utter) currentUtterance = null;
       opts.onError?.(e.error || 'unknown');
       opts.onEnd?.();
     };
@@ -92,6 +105,7 @@ export function speak(
 
 export function cancelSpeech() {
   if (isTtsAvailable()) window.speechSynthesis.cancel();
+  currentUtterance = null;
 }
 
 export function isSpeaking(): boolean {

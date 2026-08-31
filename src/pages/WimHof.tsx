@@ -5,7 +5,7 @@ import { Button, Card, Pill, SectionTitle } from '../components/ui';
 import { BreathOrb } from '../components/BreathOrb';
 import { EducationPanel } from '../components/EducationPanel';
 import { VoiceTestButton } from '../components/VoiceTestButton';
-import { AMBIENT_TRACKS, playBeep, playChime, startAmbientTrack, unlockAudio, type AmbientHandle } from '../lib/audio';
+import { AMBIENT_TRACKS, playChime, playSoftTone, startAmbientTrack, unlockAudio, type AmbientHandle } from '../lib/audio';
 import { speakNarration } from '../lib/narration';
 import { logSession } from '../lib/storage';
 import { formatMMSS } from '../hooks/useTimer';
@@ -105,11 +105,11 @@ export default function WimHof() {
     }
     setBreathIndex(index);
     setBreathStage('in');
-    playBeep(720, 0.08, 0.18);
+    playSoftTone(560, 0.3, 0.16);
     const { inhale, exhale } = PACE_MS[pace];
     timeoutRef.current = window.setTimeout(() => {
       setBreathStage('out');
-      playBeep(480, 0.08, 0.14);
+      playSoftTone(380, 0.32, 0.14);
       timeoutRef.current = window.setTimeout(() => runBreathCycle(index + 1, round), exhale);
     }, inhale);
   }
@@ -120,7 +120,7 @@ export default function WimHof() {
     setBestHold(bestHoldRef.current);
     setPhase('recovery');
     setRecoverySecondsLeft(recoveryHoldSec);
-    playBeep(880, 0.1, 0.22);
+    playSoftTone(660, 0.4, 0.2);
     speakIfOn('wimhof.recovery-start', 'Weź głęboki wdech i zatrzymaj powietrze.');
     let remaining = recoveryHoldSec;
     intervalRef.current = window.setInterval(() => {
