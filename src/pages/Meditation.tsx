@@ -3,6 +3,7 @@ import { Bell } from 'lucide-react';
 import { Button, Card, Pill, ProgressRing, SectionTitle } from '../components/ui';
 import { GuidedPlayer, type GuidedPhase } from '../components/GuidedPlayer';
 import { EducationPanel } from '../components/EducationPanel';
+import { VoiceTestButton } from '../components/VoiceTestButton';
 import { MEDITATION_TECHNIQUES, type MeditationTechnique } from '../data/meditations';
 import { logSession } from '../lib/storage';
 import { playBell, playChime, unlockAudio } from '../lib/audio';
@@ -142,10 +143,13 @@ function GuidedMeditation() {
             </div>
             <input type="range" min={5} max={30} step={5} value={minutes} onChange={(e) => setMinutes(Number(e.target.value))} className="w-full accent-[var(--color-primary)]" />
           </div>
-          <label className="flex items-center gap-2 text-sm text-[var(--color-muted)]">
-            <input type="checkbox" checked={voiceOn} onChange={(e) => setVoiceOn(e.target.checked)} className="accent-[var(--color-primary)]" />
-            Narracja głosowa (PL)
-          </label>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <label className="flex items-center gap-2 text-sm text-[var(--color-muted)]">
+              <input type="checkbox" checked={voiceOn} onChange={(e) => setVoiceOn(e.target.checked)} className="accent-[var(--color-primary)]" />
+              Narracja głosowa (PL)
+            </label>
+            <VoiceTestButton />
+          </div>
           <Button className="w-full" onClick={start}>
             Rozpocznij medytację
           </Button>

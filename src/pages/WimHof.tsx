@@ -4,6 +4,7 @@ import { AlertTriangle, PartyPopper, Sparkles } from 'lucide-react';
 import { Button, Card, Pill, SectionTitle } from '../components/ui';
 import { BreathOrb } from '../components/BreathOrb';
 import { EducationPanel } from '../components/EducationPanel';
+import { VoiceTestButton } from '../components/VoiceTestButton';
 import { AMBIENT_TRACKS, playBeep, playChime, startAmbientTrack, unlockAudio, type AmbientHandle } from '../lib/audio';
 import { speakNarration } from '../lib/narration';
 import { logSession } from '../lib/storage';
@@ -257,10 +258,13 @@ export default function WimHof() {
                 className="w-full accent-[var(--color-primary)]"
               />
             </div>
-            <label className="flex items-center gap-2 text-sm text-[var(--color-muted)]">
-              <input type="checkbox" checked={voiceOn} onChange={(e) => setVoiceOn(e.target.checked)} className="accent-[var(--color-primary)]" />
-              Narracja głosowa (PL)
-            </label>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <label className="flex items-center gap-2 text-sm text-[var(--color-muted)]">
+                <input type="checkbox" checked={voiceOn} onChange={(e) => setVoiceOn(e.target.checked)} className="accent-[var(--color-primary)]" />
+                Narracja głosowa (PL)
+              </label>
+              <VoiceTestButton />
+            </div>
             <div>
               <label className="mb-2 flex items-center gap-2 text-sm text-[var(--color-muted)]">
                 <input type="checkbox" checked={musicOn} onChange={(e) => setMusicOn(e.target.checked)} className="accent-[var(--color-primary)]" />

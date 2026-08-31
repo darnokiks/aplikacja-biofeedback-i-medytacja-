@@ -3,6 +3,7 @@ import { Leaf } from 'lucide-react';
 import { Button, Card, SectionTitle } from '../components/ui';
 import { GuidedPlayer, type GuidedPhase } from '../components/GuidedPlayer';
 import { EducationPanel } from '../components/EducationPanel';
+import { VoiceTestButton } from '../components/VoiceTestButton';
 import { JACOBSON_INTRO, JACOBSON_OUTRO, MUSCLE_GROUPS } from '../data/jacobson';
 import { logSession } from '../lib/storage';
 import { unlockAudio } from '../lib/audio';
@@ -87,10 +88,13 @@ export default function Jacobson() {
               </div>
               <input type="range" min={10} max={30} value={relaxSec} onChange={(e) => setRelaxSec(Number(e.target.value))} className="w-full accent-[var(--color-primary)]" />
             </div>
-            <label className="flex items-center gap-2 text-sm text-[var(--color-muted)]">
-              <input type="checkbox" checked={voiceOn} onChange={(e) => setVoiceOn(e.target.checked)} className="accent-[var(--color-primary)]" />
-              Narracja głosowa (PL)
-            </label>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <label className="flex items-center gap-2 text-sm text-[var(--color-muted)]">
+                <input type="checkbox" checked={voiceOn} onChange={(e) => setVoiceOn(e.target.checked)} className="accent-[var(--color-primary)]" />
+                Narracja głosowa (PL)
+              </label>
+              <VoiceTestButton />
+            </div>
             <p className="text-sm text-[var(--color-muted)]">
               Pełna sekwencja obejmuje {MUSCLE_GROUPS.length} grup mięśniowych i potrwa około{' '}
               {Math.round((MUSCLE_GROUPS.length * (tenseSec + relaxSec) + 22) / 60)} min.
