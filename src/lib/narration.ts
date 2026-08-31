@@ -16,6 +16,9 @@ let currentAudio: HTMLAudioElement | null = null;
 export interface NarrationOptions {
   rate?: number;
   onEnd?: () => void;
+  /** Wywoływane, gdy synteza mowy się nie powiedzie (np. brak zainstalowanych głosów w
+   * przeglądarce) — pozwala pokazać użytkownikowi widoczną informację zamiast ciszy bez wyjaśnienia. */
+  onError?: (reason: string) => void;
 }
 
 export function speakNarration(id: string, text: string, opts: NarrationOptions = {}) {

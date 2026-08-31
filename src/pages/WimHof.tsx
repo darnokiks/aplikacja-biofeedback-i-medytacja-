@@ -24,6 +24,7 @@ export default function WimHof() {
   const [pace, setPace] = useState<Pace>('medium');
   const [recoveryHoldSec, setRecoveryHoldSec] = useState(15);
   const [voiceOn, setVoiceOn] = useState(false);
+  const [voiceError, setVoiceError] = useState(false);
   const [musicOn, setMusicOn] = useState(true);
   const [musicVolume, setMusicVolume] = useState(0.35);
   const [musicTrack, setMusicTrack] = useState('heart-pulse');
@@ -66,7 +67,7 @@ export default function WimHof() {
 
   function speakIfOn(id: string, text: string) {
     if (!voiceOn) return;
-    speakNarration(id, text);
+    speakNarration(id, text, { onError: () => setVoiceError(true) });
   }
 
   function startSession() {
@@ -188,6 +189,18 @@ export default function WimHof() {
           przerwij i oddychaj normalnie.
         </p>
       </Card>
+
+      {voiceOn && voiceError && (
+        <Card className="mb-6 border-amber-400/20 bg-amber-400/5">
+          <p className="flex items-start gap-2 text-sm text-amber-200">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+            <span>
+              Głos nie działa w tej przeglądarce (brak zainstalowanych głosów syntezy mowy) — kontynuuj z tekstem
+              instrukcji na ekranie.
+            </span>
+          </p>
+        </Card>
+      )}
 
       {phase === 'setup' && (
         <Card className="mx-auto max-w-xl">

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { AlertTriangle } from 'lucide-react';
 import { Button, Pill, ProgressRing } from './ui';
 import { playBeep, playChime } from '../lib/audio';
 import { speakNarration, stopNarration } from '../lib/narration';
@@ -25,6 +26,7 @@ export function GuidedPlayer({
   const [index, setIndex] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(phases[0]?.durationSec ?? 0);
   const [paused, setPaused] = useState(false);
+  const [voiceError, setVoiceError] = useState(false);
 
   const intervalRef = useRef<number | null>(null);
   const secondsRef = useRef(phases[0]?.durationSec ?? 0);
@@ -65,7 +67,7 @@ export function GuidedPlayer({
     secondsRef.current = dur;
     setSecondsLeft(dur);
     playBeep(700, 0.08, 0.16);
-    if (voiceOn) speakNarration(phases[i].id, phases[i].instruction);
+    if (voiceOn) speakNarration(phases[i].id, phases[i].instruction, { onError: () => setVoiceError(true) });
     runInterval();
   }
 
@@ -113,6 +115,15 @@ export function GuidedPlayer({
         <h3 className="text-xl font-semibold text-[var(--color-text)]">{phase.title}</h3>
         <p className="mt-2 text-[var(--color-muted)]">{phase.instruction}</p>
       </div>
+      {voiceOn && voiceError && (
+        <p className="flex max-w-md items-start gap-2 rounded-lg bg-amber-400/10 px-3 py-2 text-xs text-amber-200">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+          <span>
+            Głos nie działa w tej przeglądarce (brak zainstalowanych głosów syntezy mowy) — kontynuuj z tekstem
+            instrukcji na ekranie.
+          </span>
+        </p>
+      )}
       <div className="flex gap-3">
         <Button variant="ghost" onClick={onExit}>
           Zakończ

@@ -35,20 +35,59 @@ export function isTtsAvailable(): boolean {
   return typeof window !== 'undefined' && 'speechSynthesis' in window;
 }
 
-export function speak(text: string, opts: { rate?: number; pitch?: number; onEnd?: () => void } = {}) {
+export function hasVoices(): boolean {
+  return isTtsAvailable() && window.speechSynthesis.getVoices().length > 0;
+}
+
+// Chrome ma udokumentowany błąd: speechSynthesis.speak() wywołane od razu po cancel() bywa po
+// cichu ignorowane (utterance nigdy się nie zaczyna, bez błędu). Odkładamy właściwe wywołanie
+// o jeden tick, żeby dać przeglądarce czas na faktyczne wyczyszczenie kolejki.
+const SPEAK_AFTER_CANCEL_DELAY_MS = 60;
+
+// Drugi udokumentowany błąd Chrome: speechSynthesis usypia/przerywa mowę po ~15s bezczynności
+// (np. długi tekst bez przerw), jeśli nikt nie "budzi" go wywołaniem resume(). Odświeżamy co 5s,
+// dopóki dana wypowiedź trwa.
+const RESUME_HEARTBEAT_MS = 5000;
+
+export function speak(
+  text: string,
+  opts: { rate?: number; pitch?: number; onEnd?: () => void; onError?: (reason: string) => void } = {},
+) {
   if (!isTtsAvailable()) {
+    opts.onError?.('unsupported');
     opts.onEnd?.();
     return;
   }
   if (!voicesLoaded) loadVoices();
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = 'pl-PL';
-  if (plVoice) utter.voice = plVoice;
-  utter.rate = opts.rate ?? 0.92;
-  utter.pitch = opts.pitch ?? 1;
-  utter.onend = () => opts.onEnd?.();
-  utter.onerror = () => opts.onEnd?.();
-  window.speechSynthesis.speak(utter);
+
+  window.setTimeout(() => {
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'pl-PL';
+    if (plVoice) utter.voice = plVoice;
+    utter.rate = opts.rate ?? 0.92;
+    utter.pitch = opts.pitch ?? 1;
+
+    let heartbeat: number | null = null;
+    const clearHeartbeat = () => {
+      if (heartbeat !== null) {
+        window.clearInterval(heartbeat);
+        heartbeat = null;
+      }
+    };
+    utter.onstart = () => {
+      heartbeat = window.setInterval(() => window.speechSynthesis.resume(), RESUME_HEARTBEAT_MS);
+    };
+    utter.onend = () => {
+      clearHeartbeat();
+      opts.onEnd?.();
+    };
+    utter.onerror = (e) => {
+      clearHeartbeat();
+      opts.onError?.(e.error || 'unknown');
+      opts.onEnd?.();
+    };
+    window.speechSynthesis.speak(utter);
+  }, SPEAK_AFTER_CANCEL_DELAY_MS);
 }
 
 export function cancelSpeech() {

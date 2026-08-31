@@ -61,6 +61,13 @@ prawdziwe nagranie, wrzuć plik audio pod odpowiednią nazwą i dopisz wpis do `
 generuje ani nie zawiera nagrań prawdziwego ludzkiego głosu** — to wymaga albo nagrania własnego, albo płatnego
 serwisu TTS (np. ElevenLabs), do którego to środowisko nie ma dostępu.
 
+`speak()` w `src/lib/tts.ts` ma dwa obejścia udokumentowanych błędów Chrome, które potrafią sprawić, że synteza mowy
+po cichu nic nie mówi: (1) `speechSynthesis.speak()` wywołane od razu po `cancel()` bywa zignorowane — każde
+wywołanie jest teraz odłożone o ~60ms; (2) długie wypowiedzi bywają usypiane po ~15s bezczynności — w trakcie mowy
+działa heartbeat co 5s wywołujący `resume()`. Jeśli mimo to synteza się nie powiedzie (np. przeglądarka nie ma
+zainstalowanych żadnych głosów — zdarza się na minimalnych instalacjach Linuksa bez pakietu mowy), moduły z narracją
+(Jacobson, Schultz, medytacja, Wim Hof) pokazują widoczny komunikat zamiast ciszy bez wyjaśnienia.
+
 Biblioteka muzyki ambientowej działa analogicznie: `startAmbientTrack()` w `src/lib/audio.ts` sprawdza
 `MUSIC_MANIFEST` i odtwarza prawdziwy plik z `public/audio/music/<id>.mp3`, jeśli jest dostępny, w przeciwnym razie
 generuje utwór w 100% syntetycznie. Oba manifesty są dziś puste — folder `public/audio/` to gotowe miejsce na
