@@ -151,8 +151,13 @@ export function Layout({ children }: { children: ReactNode }) {
       </header>
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">{children}</main>
       <footer className="mx-auto max-w-6xl px-4 pb-10 pt-4 text-center text-xs text-[var(--color-muted)] sm:px-6">
-        Aplikacja ma charakter edukacyjno-relaksacyjny i nie zastępuje porady medycznej. Pomiary biofeedback nie są
-        urządzeniem medycznym.
+        <p>
+          Aplikacja ma charakter edukacyjno-relaksacyjny i nie zastępuje porady medycznej. Pomiary biofeedback nie są
+          urządzeniem medycznym.
+        </p>
+        <NavLink to="/prywatnosc" className="mt-1 inline-block underline hover:text-[var(--color-text)]">
+          Polityka prywatności
+        </NavLink>
       </footer>
     </div>
   );

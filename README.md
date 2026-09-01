@@ -152,10 +152,38 @@ oraz opakowany w [Capacitor](https://capacitorjs.com) do budowy natywnych aplika
 (`android/`) i iOS (`ios/`) są już w repo — **budowanie natywnych binarek wymaga jednak narzędzi, których nie ma w
 tym środowisku (sandboxie Claude Code)**: Android Studio + Android SDK dla Androida, oraz macOS + Xcode dla iOS.
 
-Zanim opublikujesz w sklepach, zmień `appId` w `capacitor.config.ts` z placeholdera `com.example.spokoj` na docelowy,
-unikalny identyfikator.
+Zanim opublikujesz w sklepach, zmień `appId` w `capacitor.config.ts` z placeholdera `com.example.mentalwellness` na
+docelowy, unikalny identyfikator, którym faktycznie chcesz się posługiwać w sklepie (reverse-DNS, np.
+`com.twojafirma.mentalwellness`) — po pierwszej publikacji zmiana `appId` oznacza w praktyce nową aplikację, nie
+aktualizację istniejącej.
 
-**Android** (wymaga [Android Studio](https://developer.android.com/studio) na dowolnym systemie):
+### Publikacja w Google Play — checklist
+
+To, co może zrobić Claude Code w tym środowisku (kod, konfiguracja, treści) jest już gotowe. Reszta wymaga Twojego
+komputera i kont, do których to środowisko nie ma dostępu:
+
+1. **Konto Google Play Console** — [play.google.com/console](https://play.google.com/console), jednorazowa opłata
+   25 USD, weryfikacja tożsamości (może potrwać kilka dni).
+2. **Android Studio** na Twoim komputerze — [developer.android.com/studio](https://developer.android.com/studio).
+   `npm run android:open` buduje web app, synchronizuje z Capacitor i otwiera projekt.
+3. **Docelowy `appId`** w `capacitor.config.ts` (patrz wyżej) — ustaw go raz, przed pierwszą publikacją.
+4. **Podpisany klucz (keystore)** — w Android Studio: `Build > Generate Signed App Bundle/APK`. **Zapisz plik
+   keystore i hasło w bezpiecznym miejscu (menedżer haseł, nie tylko dysk) — jego utrata oznacza, że nigdy więcej
+   nie zaktualizujesz tej aplikacji pod tym samym wpisem w sklepie.**
+5. **Polityka prywatności** — strona `/prywatnosc` w apce (`src/pages/Privacy.tsx`) jest gotowa i opisuje uczciwie,
+   że wszystko działa lokalnie (bez backendu, bez analityki). Google Play wymaga publicznego URL-a do niej w
+   ustawieniach wpisu — musisz najpierw wystawić apkę pod stałym adresem (patrz niżej), a przedtem uzupełnić
+   placeholder adresu kontaktowego w tym pliku.
+6. **Formularz "Data safety"** w Play Console — zadeklaruj zbierane dane zgodnie z tym, co faktycznie się dzieje:
+   kamera (biofeedback, przetwarzana lokalnie), Bluetooth (dane fizjologiczne z czujnika/EEG, lokalnie), opcjonalne
+   logowanie (imię/e-mail/awatar z Google/Facebook, zapisywane tylko lokalnie) — bez serwera, bez sprzedaży danych.
+7. **Materiały do wpisu w sklepie** — ikona (już wygenerowana, `public/icons/`), zrzuty ekranu z różnych rozmiarów
+   ekranu, grafika promocyjna, opis krótki/pełny, kategoria aplikacji.
+8. **Ankieta oceny treści** (content rating) w Play Console — moduł stroboskopu (patrz uwaga niżej) może wymagać
+   dodatkowej uwagi przy odpowiadaniu na pytania o migające/pulsujące światło.
+9. Zbuduj podpisany **Android App Bundle (.aab)**, wgraj do Play Console, wypełnij wpis, wyślij do recenzji.
+
+**Android**:
 ```bash
 npm run android:open   # buduje web app, synchronizuje z Capacitor, otwiera Android Studio
 # w Android Studio: Build > Generate Signed App Bundle/APK

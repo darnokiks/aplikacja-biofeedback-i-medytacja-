@@ -18,6 +18,7 @@ import Devices from './pages/Devices';
 import Progress from './pages/Progress';
 import Alarms from './pages/Alarms';
 import Login from './pages/Login';
+import Privacy from './pages/Privacy';
 import NotFound from './pages/NotFound';
 
 export default function App() {
@@ -43,6 +44,7 @@ export default function App() {
           <Route path="/postepy" element={<Progress />} />
           <Route path="/budzik" element={<Alarms />} />
           <Route path="/logowanie" element={<Login />} />
+          <Route path="/prywatnosc" element={<Privacy />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Layout>
