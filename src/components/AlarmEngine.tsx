@@ -16,6 +16,7 @@ import {
   type Alarm,
   type Reminder,
 } from '../lib/alarms';
+import { onNativeAlarmTapped } from '../lib/nativeAlarms';
 
 function pad2(n: number): string {
   return String(n).padStart(2, '0');
@@ -72,9 +73,16 @@ export function AlarmEngine() {
   useEffect(() => {
     checkDue();
     const interval = window.setInterval(checkDue, 15000);
+    // Android/iOS same otwierają apkę po dotknięciu natywnego powiadomienia (nawet gdy była
+    // zamknięta) — to tu dogrywamy nawigację do rutyny, żeby dotknięcie budzika od razu
+    // odpalało np. oddech Wima Hofa, tak jak przycisk „Wyłącz i zacznij" w web-owym UI.
+    const unsubscribeTap = onNativeAlarmTapped((routineRoute) => {
+      navigate(routineRoute || '/budzik', routineRoute ? { state: { autoStart: true } } : undefined);
+    });
     return () => {
       window.clearInterval(interval);
       toneRef.current?.stop();
+      unsubscribeTap();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

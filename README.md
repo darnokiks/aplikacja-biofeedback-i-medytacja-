@@ -45,7 +45,12 @@ Dlatego budzik działa w dwóch warstwach:
    automatycznie przełącza się na `@capacitor/local-notifications`, czyli prawdziwe powiadomienia systemowe
    Androida/iOS, które działają nawet przy zablokowanym ekranie. Strona `/budzik` planuje powiadomienia w obu
    warstwach jednocześnie — na wersji webowej realnie działa tylko silnik pierwszoplanowy, na natywnej przejmują
-   powiadomienia systemowe.
+   powiadomienia systemowe. Dotknięcie takiego powiadomienia (nawet gdy apka była całkiem zamknięta) uruchamia
+   apkę i — dzięki `onNativeAlarmTapped` podpiętemu w `AlarmEngine.tsx` — od razu nawiguje do rutyny budzika z
+   auto-startem, dokładnie tak jak przycisk „Wyłącz i zacznij" w wersji webowej. Uprawnienia (powiadomienia na
+   Androidzie 13+, dokładne alarmy na Androidzie 12+) są deklarowane przez sam plugin `@capacitor/local-notifications`
+   (scalane do `AndroidManifest.xml` przy buildzie) — plugin sam pokazuje systemowy ekran „Alarmy i przypomnienia",
+   jeśli trzeba, przy pierwszym planowaniu alarmu.
 
 Auto-start porannej rutyny po wyłączeniu budzika jest obecnie podpięty tylko pod **Oddech Wima Hofa**
 (`useLocation().state?.autoStart` w `src/pages/WimHof.tsx`) — dodanie tego do kolejnych modułów wymaga tej samej,
