@@ -145,6 +145,22 @@ npm run build     # build produkcyjny
 npm run preview   # podgląd builda produkcyjnego
 ```
 
+## Stały publiczny adres (GitHub Pages)
+
+Aplikacja jest automatycznie budowana i publikowana pod stałym adresem przy każdym pushu do gałęzi
+`claude/meditation-feedback-app-ctir2u` — patrz `.github/workflows/deploy-pages.yml` (build przez Vite +
+`actions/deploy-pages`). Dzięki temu można ją otworzyć na telefonie i przetestować realne funkcje, których nie da
+się sprawdzić w podglądzie Artifact: logowanie Google/Facebook (wymaga prawdziwej domeny w konfiguracji OAuth),
+Web Bluetooth, kamerę i **budzik** (trzymając kartę otwartą w tle telefonu, patrz sekcja „Budzik" wyżej).
+
+Jednorazowa czynność po stronie repo (nie da się tego zrobić z tej sesji): w ustawieniach repozytorium na GitHubie
+wejdź w **Settings → Pages** i ustaw **Source: GitHub Actions**. Po wykonaniu tego kroku i pierwszym udanym
+przebiegu workflow adres aplikacji pojawi się w zakładce **Actions** (w podsumowaniu przebiegu `deploy`) oraz w
+**Settings → Pages** — zwykle ma postać `https://<nazwa-użytkownika>.github.io/<nazwa-repo>/`.
+
+`base: './'` w `vite.config.ts` sprawia, że ta sama paczka działa poprawnie zarówno pod tym adresem (dowolna
+głębokość ścieżki), jak i lokalnie oraz w WebView Capacitora — nie trzeba nic przestrajać między środowiskami.
+
 ## Aplikacja mobilna (Android / iOS)
 
 Projekt jest przygotowany jako PWA (instalowalna z przeglądarki, `manifest.webmanifest` + ikony w `public/icons`)
